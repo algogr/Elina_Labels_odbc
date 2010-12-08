@@ -19,6 +19,8 @@ Elina_Labels::Elina_Labels(QWidget *parent,QSqlDatabase *db,QSqlDatabase *db1) :
 	ui.setupUi(this);
 	ui.nextButton->setEnabled(FALSE);
 
+
+
 	ui.tableView->setModel(model);
 	ui.tableView->setColumnWidth(0, 150);
 	ui.tableView->setColumnWidth(1, 500);
@@ -129,7 +131,7 @@ void Elina_Labels::displayError(QAbstractSocket::SocketError socketError) {
 void Elina_Labels::setupModel_Code(QString like) {
 	QString
 			query =
-					("SELECT kodikos_p,perigrafi FROM telika_proionta where kodikos_p like \'");
+					("SELECT kodikos_p,perigrafi FROM telika_proionta where kodikos_p like \'%");
 
 	query.append(like);
 	QString sup = "%\'";
@@ -199,14 +201,18 @@ void Elina_Labels::next1Clicked() {
 
 	if (check_kef_code()==FALSE) return;
 
-	QString code_t=	insert_db_prod();
 
-	//print_label(code_t);
+	QString code_t=	insert_db_prod();
+	print_label(code_t);
+
+	if (ui.dummycheckBox->isChecked()==FALSE)
+	{
+
 	this->scanlabels_dialog->move(200,300);
 
 	this->scanlabels_dialog->show();
 	this->scanlabels_dialog->activateWindow();
-
+	}
 
 }
 
@@ -220,10 +226,11 @@ bool Elina_Labels::check_kef_code() {
 	k = query.at() + 1;
 
 	if (k < 1) {
-		QMessageBox::critical(0, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-				"Ο κωδικός δεν βρέθηκε στο ΚΕΦ.\n"
-					"Πιέστε ΟΚ για συνέχεια."), QMessageBox::Ok,
-				QMessageBox::NoButton);
+		QDate pr_date = QDate::currentDate();
+		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+						"Ο κωδικός δεν βρέθηκε στο ΚΕΦ.\n"
+					"Πιέστε ΟΚ για συνέχεια."));
+    query.exec("insert into notfound (code,prdate) values ('"+code+"','"+pr_date.toString("MM-dd-yyyy")+"')");
 		return FALSE;
 	}
 	return TRUE;
@@ -391,12 +398,15 @@ void Elina_Labels::print_label(QString code_t) {
 	//Qt implementation test
 	QFile fh("/dev/lp0");
 	fh.open(QIODevice::WriteOnly);
+	qDebug()<<fh.error();
 	QTextStream out(&fh);
 
-	QFile lab("lab/Elina.txt");
+	QFile lab((QString)APATH+"lab/Elina.txt");
+
 	QString line;
 
 	if (lab.open(QFile::ReadOnly)) {
+		qDebug()<<lab.error();
 		QTextStream in(&lab);
 		out.setCodec("UTF-8 ");
 		//out.setCodec("UTF-8");
@@ -416,6 +426,7 @@ void Elina_Labels::print_label(QString code_t) {
 			out.flush();
 
 		} while (!line.isNull());
+		qDebug()<<lab.error();
 	}
 	fh.close();
 }

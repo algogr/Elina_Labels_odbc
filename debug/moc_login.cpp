@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'login.h'
 **
-** Created: Wed Nov 24 12:04:21 2010
+** Created: Tue Dec 7 09:39:02 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.3)
 **
 ** WARNING! All changes made in this file will be lost!

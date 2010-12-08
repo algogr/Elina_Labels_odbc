@@ -109,7 +109,7 @@ void scanlabels::Cont()
 				QString id=query.value(1).toString();
 				QDateTime pr_date=QDateTime::currentDateTime();
 				if (quality!="3A"){
-				QString insert="INSERT INTO IMPSTOCKTRANS(REC_ID,COMID,RECSTATUS,STDATE,SCODE,STTRANSKIND,STDOC,STLOCATION,STQUANT,STLOTCODE) VALUES ("+s_rec_id+",10,0,'"+
+				QString insert="INSERT INTO IMPSTOCKTRANS(REC_ID,COMID,RECSTATUS,STDATE,SCODE,STTRANSKIND,STDOC,STLOCATION,STQUANT,STLOTCODE) VALUES ("+s_rec_id+","+COMID+",0,'"+
 			    pr_date.toString("MM-dd-yyyy")+"','"+code+"',66,'PARAGOGI',1,"+quant+",'"+partida+"')";
 				query.exec(insert);
 				Elina_Labels *j;

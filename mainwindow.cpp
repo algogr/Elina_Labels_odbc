@@ -25,6 +25,8 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 	connect(ui.action, SIGNAL(triggered()), this, SLOT(labels()));
 	connect(ui.action_8, SIGNAL(triggered()), this, SLOT(logout()));
 	connect(ui.actionProductio, SIGNAL(triggered()), this, SLOT(production_rep()));
+	connect(ui.action3A, SIGNAL(triggered()), this, SLOT(rep_3A()));
+	//connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
 }
 
 mainWindow::~mainWindow()
@@ -37,7 +39,7 @@ void mainWindow::labels()
 	Elina_Labels *w= new Elina_Labels(this,&db,&db1);
 
 	w->show();
-	w->move(100,100);
+	w->move(200,200);
 }
 
 void mainWindow::logout()
@@ -51,5 +53,12 @@ void mainWindow::production_rep()
 {
 	production *w=new production(this,&db1);
 	w->show();
-	w->move(100,100);
+	w->move(200,200);
+}
+
+void mainWindow::rep_3A()
+{
+	r3A *w=new r3A(this,&db1);
+	w->show();
+	w->move(200,200);
 }

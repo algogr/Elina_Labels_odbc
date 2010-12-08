@@ -4,19 +4,22 @@ QT += core \
     gui \
     sql \
     network
-HEADERS += constants.h \
+HEADERS += r3a.h \
+    constants.h \
     production.h \
     mainwindow.h \
     login.h \
     scanlabels.h \
     elina_labels.h
-SOURCES += production.cpp \
+SOURCES += r3a.cpp \
+    production.cpp \
     mainwindow.cpp \
     login.cpp \
     scanlabels.cpp \
     main.cpp \
     elina_labels.cpp
-FORMS += production.ui \
+FORMS += r3a.ui \
+    production.ui \
     mainwindow.ui \
     login.ui \
     scanlabels.ui \

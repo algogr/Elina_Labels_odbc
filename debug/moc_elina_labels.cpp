@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'elina_labels.h'
 **
-** Created: Tue Nov 23 17:59:42 2010
+** Created: Tue Dec 7 09:39:04 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.3)
 **
 ** WARNING! All changes made in this file will be lost!
