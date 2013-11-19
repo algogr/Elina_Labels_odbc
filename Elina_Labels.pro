@@ -4,24 +4,30 @@ QT += core \
     gui \
     sql \
     network
-HEADERS += r3a.h \
+HEADERS += rewrap.h \
+    mainwindow.h \
+    ktreport.h \
+    r3a.h \
     constants.h \
     production.h \
-    mainwindow.h \
     login.h \
-    scanlabels.h \
-    elina_labels.h
-SOURCES += r3a.cpp \
-    production.cpp \
+    elina_labels.h \
+    mailsender.h
+SOURCES += rewrap.cpp \
     mainwindow.cpp \
+    ktreport.cpp \
+    r3a.cpp \
+    production.cpp \
     login.cpp \
-    scanlabels.cpp \
     main.cpp \
-    elina_labels.cpp
-FORMS += r3a.ui \
-    production.ui \
+    elina_labels.cpp \
+    mailsender.cpp
+FORMS += rewrap.ui \
     mainwindow.ui \
+    ktreport.ui \
+    r3a.ui \
+    production.ui \
     login.ui \
-    scanlabels.ui \
     elina_labels.ui
 RESOURCES += 
+CONFIG += serialport

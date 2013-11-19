@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Tue Dec 7 09:39:00 2010
+** Created: Wed Aug 22 13:23:03 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_mainWindow[] = {
        4,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -35,13 +35,14 @@ static const uint qt_meta_data_mainWindow[] = {
       21,   11,   11,   11, 0x08,
       30,   11,   11,   11, 0x08,
       47,   11,   11,   11, 0x08,
+      56,   11,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_mainWindow[] = {
     "mainWindow\0\0labels()\0logout()\0"
-    "production_rep()\0rep_3A()\0"
+    "production_rep()\0rep_3A()\0rep_KT()\0"
 };
 
 const QMetaObject mainWindow::staticMetaObject = {
@@ -77,9 +78,10 @@ int mainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: logout(); break;
         case 2: production_rep(); break;
         case 3: rep_3A(); break;
+        case 4: rep_KT(); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }

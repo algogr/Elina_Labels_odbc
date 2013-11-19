@@ -49,6 +49,9 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="text">
+    <string>user</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="passlineEdit_2">
    <property name="geometry">

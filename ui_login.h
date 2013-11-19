@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'login.ui'
 **
-** Created: Mon Oct 11 19:37:01 2010
-**      by: Qt User Interface Compiler version 4.6.3
+** Created: Thu Jun 27 12:45:33 2013
+**      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -64,6 +64,7 @@ public:
         label->setText(QApplication::translate("loginClass", "Username\n"
 "", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("loginClass", "Password", 0, QApplication::UnicodeUTF8));
+        userlineEdit->setText(QApplication::translate("loginClass", "user", 0, QApplication::UnicodeUTF8));
         okButton->setText(QApplication::translate("loginClass", "OK", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

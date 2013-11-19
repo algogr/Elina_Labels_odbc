@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWindowClass</class>
+ <widget class="QMainWindow" name="mainWindowClass">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Ετικέτες</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normalon>images/Barcode.png</normalon>
+   </iconset>
+  </property>
+  <property name="locale">
+   <locale language="Greek" country="Greece"/>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1024</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Διαχείριση</string>
+    </property>
+    <addaction name="action_2"/>
+    <addaction name="action_9"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Αναφορές</string>
+    </property>
+    <addaction name="actionProduction"/>
+    <addaction name="action3A_2"/>
+    <addaction name="actionK_T_2"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>Ετικέτες</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Παραγωγή Ημέρας</string>
+   </property>
+  </action>
+  <action name="action3">
+   <property name="text">
+    <string>3Α</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>Κωδικοί Ταυτοποίησης</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>Αλλαγή χειριστή</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>Αναφορές</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>Παραγωγή</string>
+   </property>
+  </action>
+  <action name="actionProductio">
+   <property name="text">
+    <string>Production</string>
+   </property>
+  </action>
+  <action name="action3A">
+   <property name="text">
+    <string>3A</string>
+   </property>
+  </action>
+  <action name="actionK_T">
+   <property name="text">
+    <string>K/T</string>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>Αλλαγή Χειριστή</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Ετικέτες</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>Αλλαγή Χειριστή</string>
+   </property>
+  </action>
+  <action name="actionProduction">
+   <property name="text">
+    <string>Production</string>
+   </property>
+  </action>
+  <action name="action3A_2">
+   <property name="text">
+    <string>3A</string>
+   </property>
+  </action>
+  <action name="actionK_T_2">
+   <property name="text">
+    <string>K/T</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
