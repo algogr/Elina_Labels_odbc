@@ -390,7 +390,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 		qual = "2A";
 		qual1 = "Y";
 		break;
-	case 2:
+    case 2:
 		qual = "3A";
 		qual1 = "Z";
 		break;
@@ -438,6 +438,18 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 	if (day_aa.length() == 1)
 		day_aa = "0" + day_aa;
 
+
+
+    // ELEGXOS IF IS DUMMY
+
+    if (ui.dummycheckBox->checkState()==1)
+    {
+
+        middle = ui.machinespinBox->text()
+                    + ui.dummyProdDate->text().remove("/") + ui.aaSpinBox->text();
+    }
+
+    // TELOS ELEGXOY IF IS DUMMY
 	QString code_t = weight + middle + qual1 + day_aa;
 	QTime ct = QTime::currentTime();
 
@@ -451,7 +463,6 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 		vardia = "C";
 	if (hr < 6)
 		vardia = "C";
-
 
 
 	if (ui.dummycheckBox->checkState() == 0) {
@@ -490,6 +501,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 	}
 	else
 	{
+        vardia=ui.dummyVardiaCombo->currentText();
 		QString
 						insert =
 								"INSERT INTO PRODUCTION_dummy (weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
@@ -618,7 +630,7 @@ bool Elina_Labels::final_check(QString f_code) {
 				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-			return FALSE;
+            //return FALSE;
 		}
 
 	}
@@ -640,7 +652,7 @@ bool Elina_Labels::final_check(QString f_code) {
 				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-			return FALSE;
+            //return FALSE;
 		}
 
 		if (ui.aaSpinBox->text() == ui.aaSpinBox_3->text()
@@ -648,7 +660,7 @@ bool Elina_Labels::final_check(QString f_code) {
 				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-			return FALSE;
+            //return FALSE;
 		}
 		if (ui.aaSpinBox->text() == ui.aaSpinBox_2->text()
 				&& ui.machinespinBox_2->text() == ui.machinespinBox_3->text()
@@ -1111,6 +1123,9 @@ void Elina_Labels::Scanned() {
 	query.exec("select f_code from production where code_t='" + code_t + "'");
 	query.last();
 	code = query.value(0).toString();
+
+    query.exec("insert into production_deleted (weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia)(select weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia from production where code_t='"+code_t+"')");
+    query.exec("delete from production where code_t='" + code_t	+ "'");
 
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
