@@ -34,8 +34,8 @@
 #include "constants.h"
 #include "mainwindow.h"
 #include "rewrap.h"
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+//#include <QtSerialPort/QSerialPort>
+//#include <QtSerialPort/QSerialPortInfo>
 
 class mainWindow;
 class Elina_Labels : public QDialog

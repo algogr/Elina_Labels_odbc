@@ -169,7 +169,7 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
     connect(this->timer2,SIGNAL(timeout()),this,SLOT(timer2_v()));
     connect(ui.dummycheckBox,SIGNAL(clicked()),this,SLOT(dummycheckpressed()));
 
-
+/*
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
          qDebug() << "Name        : " << info.portName();
@@ -182,7 +182,7 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
          if (serial.open(QIODevice::ReadWrite))
              serial.close();
      }
-
+*/
 
 
     timer1->start(60000);
@@ -333,8 +333,8 @@ void Elina_Labels::next1Clicked() {
    //ΤΕΛΟΣ ΑΛΛΑΓΗΣ 8/7/2012
 
     print_label(code_t, f_code);
-
-	insert_db_prod(f_code);
+    if (f_code.left(1)!="E")
+        insert_db_prod(f_code);
 	insert_kef(code_t);
 
 	disable_entry_controls();
@@ -983,6 +983,7 @@ void Elina_Labels::reset_values() {
 	ui.middleDateEdit->setDate(default_date);
 	ui.middleDateEdit_2->setDate(default_date);
 	ui.middleDateEdit_3->setDate(default_date);
+    ui.dummyProdDate->setDate(default_date);
 	ui.qualCombo->setCurrentIndex(-1);
 	ui.weightLineEdit->setText("");
 	ui.pushDelPro->setEnabled(FALSE);
@@ -1147,6 +1148,10 @@ void Elina_Labels::disable_entry_controls() {
 	ui.aaSpinBox_2->setVisible(FALSE);
 	ui.middleDateEdit_2->setVisible(FALSE);
 	ui.pushDelPro->setEnabled(FALSE);
+    ui.dummyProdDate->setEnabled(FALSE);
+    ui.dummyProdDate->setVisible(FALSE);
+    ui.dummyVardiaCombo->setEnabled(FALSE);
+    ui.dummyVardiaCombo->setVisible(FALSE);
 
 }
 
@@ -1383,7 +1388,7 @@ void Elina_Labels::rowClickedSelProd(const QModelIndex &index) {
 	if (m.clickedButton() == acc) {
 
 		QMessageBox n;
-		n.setText(trUtf8("Είστε σίγουροι ότι Θέλετε να διαγράψετε τον Κ/Τ"));
+        n.setText(trUtf8("Είστε σίγουροι ότι θέλετε να διαγράψετε τον Κ/Τ"));
 		n.setInformativeText(trUtf8("ΠΡΟΣΟΧΗ!!!"));
 		QAbstractButton *acc1 = n.addButton(trUtf8("Ναί"),
 				QMessageBox::ActionRole);
@@ -1481,6 +1486,7 @@ void Elina_Labels::dummycheckpressed()
     {
         ui.dummyProdDate->setEnabled(TRUE);
         ui.dummyProdDate->setVisible(TRUE);
+        //ui.dummyProdDate->setDate(QDate::currentDate());
         ui.dummyVardiaCombo->setEnabled(TRUE);
         ui.dummyVardiaCombo->setVisible(TRUE);
         ui.label_8->setVisible(TRUE);
