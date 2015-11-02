@@ -108,7 +108,9 @@ void r3A::update()
 		if (!(u=(QCheckBox*)t)) continue;
 		if(u->checkState()==2){
 			QSqlQuery query(*db1);
-			QString dcomid=(QString) COMID;
+            QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+            QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+            QString dcomid=settings->value("comid").toString();
 			QString getmaxid="select max(rec_id) from ImpStockTrans";
 			query.exec(getmaxid);
 			query.last();

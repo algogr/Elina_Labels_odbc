@@ -775,8 +775,12 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 	qDebug() << fh.error();
 	QTextStream out(&fh);
 
-	QFile lab((QString) APATH + "lab/Elina.txt");
-	qDebug() << "dsada" << quality << fylla << width;
+
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+    QString apath=settings->value("apath").toString();
+    QFile lab((QString) apath + "lab/Elina.txt");
+
 	QString line;
 
 	if (lab.open(QFile::ReadOnly)) {
@@ -822,7 +826,9 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 		qDebug() << lab.error();
 	}
 	fh.close();
+
 	ui.pushDelPro->setEnabled(FALSE);
+    delete settings;
 }
 
 void Elina_Labels::insertClicked() {

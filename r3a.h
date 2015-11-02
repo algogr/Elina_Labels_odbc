@@ -24,7 +24,7 @@
 #include <QtSql>
 #include "mainwindow.h"
 #include "ui_r3a.h"
-#include "constants.h"
+
 #include "elina_labels.h"
 class mainWindow;
 class r3A : public QDialog

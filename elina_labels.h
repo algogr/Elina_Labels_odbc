@@ -31,7 +31,6 @@
 #include <QFile>
 #include <QVector>
 #include "ui_elina_labels.h"
-#include "constants.h"
 #include "mainwindow.h"
 #include "rewrap.h"
 //#include <QtSerialPort/QSerialPort>

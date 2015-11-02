@@ -21,9 +21,13 @@
 rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
 	QDialog(parent) {
 	ui.setupUi(this);
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+
+    QString appserver=settings->value("appserver").toString();
 
 	this->db1 = db1;
-	QHostAddress addr((QString) SVR_HOST);
+    QHostAddress addr((QString) appserver);
 	client = new QTcpSocket;
 	client->connectToHost(addr, 8889);
 
@@ -49,6 +53,7 @@ rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
 	connect(ui.lineNew5, SIGNAL(returnPressed()), this, SLOT(scanned_new5()));
 	connect(ui.pushCancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 	connect(ui.pushInsert, SIGNAL(clicked()), this, SLOT(insertClicked()));
+    delete settings;
 
 }
 

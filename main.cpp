@@ -17,7 +17,7 @@
     */
 
 #include "login.h"
-#include "constants.h"
+
 
 #include <QtGui>
 #include <QApplication>
@@ -38,13 +38,31 @@ int main(int argc, char *argv[])
     int screenHeight;
 
     int x, y;
+    QFile st(QDir::currentPath()+ "/settings.ini");
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
 
+    if(!st.open(QIODevice::ReadOnly | QIODevice::Text))
+
+        {
+            settings->setValue("dbhost","194.111.212.249");
+            settings->setValue("dbuser","sa");
+            settings->setValue("dbpassword","sa");
+            settings->setValue("dbkef","kef_dblink");
+            settings->setValue("dbext","elinaProdiagrafes");
+            settings->setValue("appserver","194.111.212.84");
+            settings->setValue("apath","/home/elina/Elina_Labels/");
+            settings->setValue("comid","7");
+            settings->sync();
+
+        }
+        st.close();
 
 
     //QTextCodec *codec = QTextCodec::codecForName( "ISO8859-7" );
     //QString result = codec->toUnicode( query->value( 0 ).toString() );
     QSplashScreen *splash = new QSplashScreen;
-    QString apath=(QString)APATH;
+    QString apath=settings->value("apath").toString();
     splash->setPixmap(QPixmap(apath+"images/Barcode.png"));
     splash->show();
     Qt::Alignment topRight = Qt::AlignRight | Qt::AlignTop;
@@ -66,6 +84,7 @@ int main(int argc, char *argv[])
 
     splash->finish(&w);
     delete splash;
+    delete (settings);
 
     //a.processEvents();
 

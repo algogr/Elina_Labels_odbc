@@ -22,27 +22,37 @@
 mainWindow::mainWindow(QWidget *parent,int mode)
     : QMainWindow(parent)
 {
+
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+
+    QString dbhost=settings->value("dbhost").toString();
+    QString dbuser=settings->value("dbuser").toString();
+    QString dbpassword=settings->value("dbpassword").toString();
+    QString dbkef=settings->value("dbkef").toString();
+    QString dbext=settings->value("dbext").toString();
+    QString appserver=settings->value("appserver").toString();
     //db=Προδιαγραφες   ----                db1=Production
 	db = QSqlDatabase::addDatabase("QTDS");
-	db.setDatabaseName(DB_EXT);
-	db.setUserName(USER);
-	db.setPassword(PASS);
-	db.setHostName(HOST);
-    qDebug()<<HOST;
-    qDebug()<<DB_EXT;
+    db.setDatabaseName(dbext);
+    db.setUserName(dbuser);
+    db.setPassword(dbpassword);
+    db.setHostName(dbhost);
+    qDebug()<<dbhost;
+    qDebug()<<dbext;
 
 	db1 = QSqlDatabase::addDatabase("QTDS","kef");
-	db1.setDatabaseName(DB_KEF);
-	db1.setUserName(USER);
-	db1.setPassword(PASS);
-	db1.setHostName(HOST);
-    qDebug()<<HOST;
-    qDebug()<<DB_KEF;
+    db1.setDatabaseName(dbkef);
+    db1.setUserName(dbuser);
+    db1.setPassword(dbpassword);
+    db1.setHostName(dbhost);
+    qDebug()<<dbhost;
+    qDebug()<<dbkef;
 	db = QSqlDatabase::database();
 	db1 = QSqlDatabase::database("kef");
 
 	ui.setupUi(this);
-	QHostAddress addr((QString)SVR_HOST);
+    QHostAddress addr((QString)appserver);
 	client = new QTcpSocket;
 	client->connectToHost(addr, 8889);
 

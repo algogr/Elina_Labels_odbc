@@ -23,7 +23,7 @@
 #include <QtGui/QDialog>
 #include <QtSql>
 #include "ui_production.h"
-#include "constants.h"
+
 
 class production : public QDialog
 {

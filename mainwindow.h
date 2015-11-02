@@ -26,7 +26,7 @@
 #include "production.h"
 #include "r3a.h"
 #include "ktreport.h"
-#include "constants.h"
+
 
 class mainWindow : public QMainWindow
 {

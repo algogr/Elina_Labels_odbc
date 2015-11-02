@@ -24,7 +24,7 @@
 #include <QtNetwork>
 #include <QtSql>
 #include <QtGui/QMessageBox>
-#include "constants.h"
+
 
 class rewrap : public QDialog
 {
