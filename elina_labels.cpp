@@ -211,7 +211,9 @@ void Elina_Labels::setupModel_Code(QString like) {
 	//qp.prepare(query);
 	//QString result = codec->toUnicode( qp.value( 0 ).toString() );
 	qp.exec(query);
+    qDebug()<<"QUERY:"<<query;
 	model1->setQuery(qp);
+
 	//		while (model1->canFetchMore())
 	//		model1->fetchMore();
 	//		int i = model1->rowCount();
@@ -305,6 +307,7 @@ void Elina_Labels::next1Clicked() {
 
 	if (kefcheck == FALSE)
 		return;
+
 	QString code_t = get_code_t(f_code);
 
     ////ΑΛΛΑΓΗ 7/8/2012 ΕΛΕΓΧΟΣ ΔΙΠΛΟΥ Κ/Τ
@@ -333,8 +336,9 @@ void Elina_Labels::next1Clicked() {
    //ΤΕΛΟΣ ΑΛΛΑΓΗΣ 8/7/2012
 
     print_label(code_t, f_code);
-    if (f_code.left(1)!="E")
-        insert_db_prod(f_code);
+    //if (f_code.left(1)!="E")
+    insert_db_prod(f_code);
+    qDebug()<<"K?T:"<<code_t;
 	insert_kef(code_t);
 
 	disable_entry_controls();
@@ -402,7 +406,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
         //qual = "K/Z";
         //qual1 = "K";
 
-		break;
+        break;
 	}
 
 	switch (ui.weightLineEdit->text().length()) {
@@ -431,9 +435,19 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 
 	QVariant a;
 
-	a = query.value(0).toInt() + 1;
+    a = query.value(0).toInt()+1 ;
+
+    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
+            + "' and middle='" + middle + "'";
+    query.exec(f_aa);
+    query.first();
+
+    a=a.toInt()+query.value(0).toInt()+1;
+
 
 	day_aa = a.toString();
+
+
 
 	if (day_aa.length() == 1)
 		day_aa = "0" + day_aa;
@@ -468,6 +482,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 	if (ui.dummycheckBox->checkState() == 0) {
         if (qual!="A")
         {
+
 		QString
 				insert =
 						"INSERT INTO PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
@@ -721,6 +736,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 	QString fylla = query.value(0).toString();
 	QTime ct = QTime::currentTime();
 	QString cdate = QDate::currentDate().toString("dd/MM/yyyy");
+
 	int hr = ct.hour();
 	QString vardia;
 	if (hr >= 6 && hr < 14)
@@ -773,9 +789,17 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
         if (ui.dummycheckBox->checkState() == 1)
         {
             dummy="*";
+
+        }
+
+        if (ui.dummycheckBox->isChecked())
+        {
+
             cdate=ui.dummyProdDate->date().toString("dd/MM/yyyy");
             vardia=ui.dummyVardiaCombo->currentText();
+
         }
+
 
 		do {
 			line = in.readLine();
@@ -1007,9 +1031,10 @@ void Elina_Labels::refresh_production() {
 
 	QString
 			a =
-					"SELECT pr_date,f_code,weight,code_t,iskef,quality,vardia from production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
+                    "SELECT pr_date,f_code,weight,code_t,iskef,quality,vardia from production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
 	query.exec(a);
 	int r = 0;
+    qDebug()<<"Q:"<<query.size();
 
 	while (query.next() != FALSE) {
 		ui.productiontableWidget->setRowCount(r + 1);
@@ -1228,7 +1253,21 @@ QString Elina_Labels::get_code_t(QString f_code) {
 	QString day_aa;
 	QVariant a;
 	a = query.value(0).toInt() + 1;
-	day_aa = a.toString();
+
+
+    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
+            + "' and middle='" + middle + "'";
+    query.exec(f_aa);
+    query.first();
+
+    a=a.toInt()+query.value(0).toInt()+1;
+
+
+    day_aa = a.toString();
+
+
+
+
 	if (day_aa.length() == 1)
 		day_aa = "0" + day_aa;
 

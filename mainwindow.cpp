@@ -30,6 +30,7 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 	db.setHostName(HOST);
     qDebug()<<HOST;
     qDebug()<<DB_EXT;
+
 	db1 = QSqlDatabase::addDatabase("QTDS","kef");
 	db1.setDatabaseName(DB_KEF);
 	db1.setUserName(USER);
@@ -64,7 +65,10 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 
 			labels();
 		}
-	//connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
+    qDebug()<<"db:"<<db.isOpen();
+    qDebug()<<"db1:"<<db1.isOpen();
+
+    //connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
 }
 
 mainWindow::~mainWindow()

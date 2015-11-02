@@ -25,7 +25,7 @@
    <property name="font">
     <font>
      <family>AlArabiya</family>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -96,14 +96,14 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>40</y>
+     <y>50</y>
      <width>211</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -113,15 +113,18 @@
   <widget class="QLabel" name="label_new1">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>200</x>
      <y>20</y>
-     <width>121</width>
-     <height>21</height>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <family>Sans Serif</family>
+     <pointsize>9</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
     </font>
    </property>
    <property name="text">
@@ -138,15 +141,15 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_new2">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>200</x>
      <y>80</y>
-     <width>121</width>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -163,15 +166,15 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_new3">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>200</x>
      <y>140</y>
-     <width>121</width>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -188,15 +191,15 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_new4">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>200</x>
      <y>200</y>
-     <width>121</width>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -213,15 +216,15 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_new5">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>200</x>
      <y>260</y>
-     <width>121</width>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -247,7 +250,7 @@ p, li { white-space: pre-wrap; }
    <property name="font">
     <font>
      <family>AlArabiya</family>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
