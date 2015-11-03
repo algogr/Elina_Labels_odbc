@@ -618,7 +618,7 @@
     </font>
    </property>
    <property name="text">
-    <string>^</string>
+    <string>Λ</string>
    </property>
   </widget>
   <widget class="QPushButton" name="downButton">
@@ -632,13 +632,13 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>30</pointsize>
+     <pointsize>35</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>v</string>
+    <string>V</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox">

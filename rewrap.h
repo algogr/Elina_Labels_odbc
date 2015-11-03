@@ -38,15 +38,22 @@ private:
     Ui::rewrapClass ui;
     QSqlDatabase *db1;
     QTcpSocket *client;
-    void insert_production(QString old_code,QStringList new_codes);
+    void insert_production(QString old_code,QStringList new_codes,QString old_acode,QStringList new_acodes);
 
 private slots:
 	void scanned_old();
+    void scanned_Aold();
 	void scanned_new1();
 	void scanned_new2();
 	void scanned_new3();
 	void scanned_new4();
 	void scanned_new5();
+    void scanned_Anew1();
+    void scanned_Anew2();
+    void scanned_Anew3();
+    void scanned_Anew4();
+    void scanned_Anew5();
+
 	void insertClicked();
 	void cancelClicked();
 

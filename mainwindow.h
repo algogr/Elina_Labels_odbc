@@ -51,6 +51,8 @@ private slots:
 	void production_rep();
 	void rep_3A();
 	void rep_KT();
+    void about();
+    void changelog();
 
 
 

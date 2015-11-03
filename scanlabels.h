@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QCheckBox>
 #include <QtSql>
-#include "ui_scanlabels.h"
+//#include "ui_scanlabels.h"
 
 
 class scanlabels : public QDialog

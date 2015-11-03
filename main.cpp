@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
             settings->setValue("appserver","194.111.212.84");
             settings->setValue("apath","/home/elina/Elina_Labels/");
             settings->setValue("comid","7");
+            settings->setValue("version","1.1");
             settings->sync();
 
         }

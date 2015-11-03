@@ -64,7 +64,9 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 	connect(ui.actionProduction, SIGNAL(triggered()), this, SLOT(production_rep()));
 	connect(ui.action3A, SIGNAL(triggered()), this, SLOT(rep_3A()));
 	connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
-	qDebug()<<"UI1:"<<&ui;
+    connect(ui.actionAbout,SIGNAL(triggered()),this,SLOT(about()));
+    //connect((ui.actionChangelog,SIGNAL(triggered())),this,SLOT(changelog()));
+
 
 	if (mode==1)
 		{
@@ -126,6 +128,26 @@ void mainWindow::rep_KT()
 	w->move(200,200);
 }
 
+void mainWindow::about()
+{
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+    QString version=settings->value("version").toString();
+    QMessageBox mb;
+    mb.setStandardButtons(QMessageBox::Ok);
+    mb.setText("Elina Labels Version:"+version);
+
+    mb.setWindowTitle("Elina Labels");
+
+    mb.exec();
+
+
+}
+
+void mainWindow::changelog()
+{
+
+}
 
 
 

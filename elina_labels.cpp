@@ -20,7 +20,7 @@
 //#include <QStringBuilder>
 #include <fstream>
 #include <iostream>
-#include "scanlabels.h"
+//#include "scanlabels.h"
 #include "mailsender.h"
 
 using namespace std;
@@ -435,7 +435,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 
 	QVariant a;
 
-    a = query.value(0).toInt()+1 ;
+    a = query.value(0).toInt() ;
 
     f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
             + "' and middle='" + middle + "'";
@@ -494,6 +494,7 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 								+ "','" + vardia + "')";
 
 		query.exec(insert);
+        qDebug()<<insert;
 		refresh_production();
         }
         
@@ -539,8 +540,9 @@ void Elina_Labels::insert_kef(QString code_t) {
             return;
 	QString pid, code, vardia;
 	QSqlQuery query(*db1);
-	query.exec("select id,f_code,vardia from production where code_t='"
-			+ code_t + "'");
+    QString querystr="select id,f_code,vardia from production where code_t='"+ code_t + "'";
+    query.exec(querystr);
+    qDebug()<<querystr;
 	query.last();
 	code = query.value(1).toString();
 	pid = query.value(0).toString();
@@ -1258,7 +1260,7 @@ QString Elina_Labels::get_code_t(QString f_code) {
 	query.first();
 	QString day_aa;
 	QVariant a;
-	a = query.value(0).toInt() + 1;
+    a = query.value(0).toInt();
 
 
     f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
