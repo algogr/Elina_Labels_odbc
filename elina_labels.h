@@ -42,10 +42,10 @@ class Elina_Labels : public QDialog
     Q_OBJECT
 
 public:
-    Elina_Labels(QWidget *parent = 0,QSqlDatabase *db=0 ,QSqlDatabase *db1=0,QTcpSocket *client=0);
+    Elina_Labels(QWidget *parent = 0,QSqlDatabase *db=0 ,QSqlDatabase *db1=0);
     ~Elina_Labels();
-
-
+    static bool checkCodeA(const QString &code);
+    static bool checkCodeT(const QString &code);
 
 
 private slots:
@@ -60,18 +60,16 @@ private slots:
      void Scanned();
      void setSpinBoxFormat();
      void clearLineEdit();
-     //void enableGetDataButton();
+
      void copy_machine();
      void copy_middledate();
      void upClicked();
      void downClicked();
      void checkClicked();
-     void startread();
+
      void weight_check();
      void rowClickedSelProd(const QModelIndex &);
-     //void delprobycell();
-     void timer1_v();
-     void timer2_v();
+
      void dummycheckpressed();
 
 
@@ -80,38 +78,43 @@ private:
     Ui::Elina_LabelsClass ui;
     QSqlDatabase *db;
     QSqlDatabase *db1;
-    QTcpSocket *client;
+
     QSqlQueryModel *model;
     QTextCodec *codec;
     QTextDecoder *decoder;
     QList<QString> ex_codes;
     int row_sel;
     mainWindow *m;
-    quint16 nextblocksize;
-    bool kefcheck;
 
 
-    void setupModel_Code(QString like);
+
+
+    void setupModel_Code(const QString &like);
     void check_kef_code(QString f_code);
-    QString insert_db_prod(QString f_code);
-    void insert_kef(QString code_t);
+    QString insert_db_prod(const QString &code_t,const QString &f_code);
     void print_label(QString code_t,QString f_code);
     bool final_check(QString f_code);
     void reset_values();
     void refresh_production();
     void disable_entry_controls();
     void enable_entry_controls();
+    bool checkDoubleCodeT(const QString &codeT);
+    void setDeleted (const QString &codeT);
+    QString createAa(const QString &middle,const QString &fCode);
+
     QString get_code_t(QString f_code);
     QString get_middle();
     QString get_middle2();
     QString get_middle3();
     QString stcode,serial;
     QString stmaxid,semaxid;
-    QTimer *timer1,*timer2;
+
 
 
 
 
 };
+
+
 
 #endif // ELINA_LABELS_H

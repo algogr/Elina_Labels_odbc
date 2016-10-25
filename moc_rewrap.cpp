@@ -1,8 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'rewrap.h'
 **
-** Created: Thu Jun 27 12:46:33 2013
-**      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
+** Created by: The Qt Meta Object Compiler version 63 (Qt 4.8.7)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,7 +10,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'rewrap.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
-#error "This file was generated using the moc from 4.8.4. It"
+#error "This file was generated using the moc from 4.8.7. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -23,7 +22,7 @@ static const uint qt_meta_data_rewrap[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -38,16 +37,27 @@ static const uint qt_meta_data_rewrap[] = {
       67,    7,    7,    7, 0x08,
       82,    7,    7,    7, 0x08,
       97,    7,    7,    7, 0x08,
-     113,    7,    7,    7, 0x08,
+     112,    7,    7,    7, 0x08,
+     128,    7,    7,    7, 0x08,
+     144,    7,    7,    7, 0x08,
+     160,    7,    7,    7, 0x08,
+     176,    7,    7,    7, 0x08,
+     192,    7,    7,    7, 0x08,
+     205,    7,    7,    7, 0x08,
+     221,    7,    7,    7, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_rewrap[] = {
-    "rewrap\0\0scanned_old()\0scanned_new1()\0"
-    "scanned_new2()\0scanned_new3()\0"
-    "scanned_new4()\0scanned_new5()\0"
-    "insertClicked()\0cancelClicked()\0"
+    "rewrap\0\0scanned_old()\0scanned_Aold()\0"
+    "scanned_new1()\0scanned_new2()\0"
+    "scanned_new3()\0scanned_new4()\0"
+    "scanned_new5()\0scanned_Anew1()\0"
+    "scanned_Anew2()\0scanned_Anew3()\0"
+    "scanned_Anew4()\0scanned_Anew5()\0"
+    "doubleread()\0insertClicked()\0"
+    "cancelClicked()\0"
 };
 
 void rewrap::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -57,13 +67,20 @@ void rewrap::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         rewrap *_t = static_cast<rewrap *>(_o);
         switch (_id) {
         case 0: _t->scanned_old(); break;
-        case 1: _t->scanned_new1(); break;
-        case 2: _t->scanned_new2(); break;
-        case 3: _t->scanned_new3(); break;
-        case 4: _t->scanned_new4(); break;
-        case 5: _t->scanned_new5(); break;
-        case 6: _t->insertClicked(); break;
-        case 7: _t->cancelClicked(); break;
+        case 1: _t->scanned_Aold(); break;
+        case 2: _t->scanned_new1(); break;
+        case 3: _t->scanned_new2(); break;
+        case 4: _t->scanned_new3(); break;
+        case 5: _t->scanned_new4(); break;
+        case 6: _t->scanned_new5(); break;
+        case 7: _t->scanned_Anew1(); break;
+        case 8: _t->scanned_Anew2(); break;
+        case 9: _t->scanned_Anew3(); break;
+        case 10: _t->scanned_Anew4(); break;
+        case 11: _t->scanned_Anew5(); break;
+        case 12: _t->doubleread(); break;
+        case 13: _t->insertClicked(); break;
+        case 14: _t->cancelClicked(); break;
         default: ;
         }
     }
@@ -102,9 +119,9 @@ int rewrap::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 15;
     }
     return _id;
 }

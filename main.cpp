@@ -16,12 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#include "login.h"
+#include "mainwindow.h"
 
 
 #include <QtGui>
 #include <QApplication>
-#include <QSharedMemory>
+
 
 
 
@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
-//    QApplication::setGlobalStrut(QSize(30, 30));
 
     int WIDTH = 400;
     int HEIGHT = 100;
+    QString VERSION = "2.0";
 
     int screenWidth;
     int screenHeight;
@@ -45,23 +45,23 @@ int main(int argc, char *argv[])
     if(!st.open(QIODevice::ReadOnly | QIODevice::Text))
 
         {
-            settings->setValue("dbhost","194.111.212.249");
+            settings->setValue("dbhost","192.168.0.250");
             settings->setValue("dbuser","sa");
             settings->setValue("dbpassword","sa");
-            settings->setValue("dbkef","kef_dblink");
+            settings->setValue("dberp","elinaProdiagrafes");
             settings->setValue("dbext","elinaProdiagrafes");
-            settings->setValue("appserver","194.111.212.84");
             settings->setValue("apath","/home/elina/Elina_Labels/");
-            settings->setValue("comid","7");
-            settings->setValue("version","1.1");
+            settings->setValue("version",VERSION);
             settings->sync();
 
         }
         st.close();
 
+    if (settings->value("version").toString()!=VERSION){
 
-    //QTextCodec *codec = QTextCodec::codecForName( "ISO8859-7" );
-    //QString result = codec->toUnicode( query->value( 0 ).toString() );
+        settings->setValue("version",VERSION);
+        settings->sync();
+    }
     QSplashScreen *splash = new QSplashScreen;
     QString apath=settings->value("apath").toString();
     splash->setPixmap(QPixmap(apath+"images/Barcode.png"));
@@ -70,7 +70,9 @@ int main(int argc, char *argv[])
     splash->showMessage(QObject::trUtf8("Εκκίνηση Εφαρμογής..."),
                         topRight, Qt::white);
 
-    login w;
+    mainWindow w(0,1);
+
+
     w.show();
     QDesktopWidget *desktop = QApplication::desktop();
 
@@ -87,30 +89,7 @@ int main(int argc, char *argv[])
     delete splash;
     delete (settings);
 
-    //a.processEvents();
 
-     //---- Check for another instance code snippet ----
-
-     //GUID : Generated once for your application
-     // you could get one GUID here: http://www.guidgenerator.com/online-guid-generator.aspx
-     //QSharedMemory shared("015ebe5f-2566-42b1-877b-1cf894c6e08b");
-
-     //if( !shared.create( 512, QSharedMemory::ReadWrite) )
-     //{
-       // For a GUI application, replace this by :
-       // QMessageBox msgBox;
-       //msgBox.setText( QObject::tr("Can't start more than one instance of the application.") );
-       //msgBox.setIcon( QMessageBox::Critical );
-       //msgBox.exec();
-
-       //qWarning() << "The application is already running.";
-
-       //exit(0);
-     //}
-     //else {
-       //  qDebug() << "Application started successfully.";
-     //}
-     //---- END OF Check for another instance code snippet ----
 
 
 

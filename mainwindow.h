@@ -37,8 +37,6 @@ public:
     ~mainWindow();
     QString currentData;
     QSqlDatabase db,db1;
-    QTcpSocket *client;
-    quint16 blockSize;
 
 
 

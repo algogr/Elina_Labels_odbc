@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>Ετικέτες</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <selectedon>images/Barcode.png</selectedon>
+   </iconset>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

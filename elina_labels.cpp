@@ -26,21 +26,21 @@
 using namespace std;
 
 Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
-		QSqlDatabase *db1, QTcpSocket *client) :
-	QDialog(parent) {
+        QSqlDatabase *db1) :
+    QDialog(parent), db(db),db1(db1) {
 	codec = QTextCodec::codecForName("Windows1253");
 	decoder = codec->makeDecoder();
-	this->db = db;
-	this->db1 = db1;
-	this->client = client;
-	this->kefcheck = TRUE;
-	m = (mainWindow*) parent;
-	setupModel_Code("");
+    model= new QSqlQueryModel;
 
-	ui.setupUi(this);
+
+	m = (mainWindow*) parent;
+    setupModel_Code("");
+
+    ui.setupUi(this);
+
 	ui.quitButton->setVisible(FALSE);
 	ui.scanlineEdit->setEnabled(FALSE);
-	//ui.productiontableWidget->setEnabled(FALSE);
+
 
 	ui.pushDelPro->setEnabled(FALSE);
 
@@ -74,7 +74,7 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 	ui.qualCombo->insertItem(1, "2A");
 	ui.qualCombo->insertItem(2, "3A");
     ui.qualCombo->insertItem(3, "A");
-	//ui.qualCombo->insertItem(4, "K/Z");
+
 
     ui.dummyVardiaCombo->insertItem(0,"A");
     ui.dummyVardiaCombo->insertItem(0,"B");
@@ -113,23 +113,8 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 	refresh_production();
 	setSpinBoxFormat();
 
-	// find out which IP to connect to
-	//QString ipAddress;
-	//QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-	// use the first non-localhost IPv4 address
-	//for (int i = 0; i < ipAddressesList.size(); ++i) {
-	//if (ipAddressesList.at(i) != QHostAddress::LocalHost
-	//	&& ipAddressesList.at(i).toIPv4Address()) {
-	//ipAddress = ipAddressesList.at(i).toString();
-	//break;
-	//}
-	//}
-	// if we did not find one, use IPv4 localhost
-	//if (ipAddress.isEmpty())
-	//ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
-    timer1=new QTimer;
-    timer2=new QTimer;
+
 	connect(ui.quitButton, SIGNAL(clicked()), this, SLOT(close()));
 
 	connect(ui.lineEdit, SIGNAL(textChanged(const QString &)), this,
@@ -157,42 +142,26 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 			SLOT(copy_machine()));
 	connect(ui.middleDateEdit, SIGNAL(dateChanged(QDate)), this,
 			SLOT(copy_middledate()));
-	connect(client, SIGNAL(readyRead()), this, SLOT(startread()));
+
 	connect(ui.checkBox, SIGNAL(clicked()), this, SLOT(checkClicked()));
 	connect(ui.pushrewrap, SIGNAL(clicked()), this, SLOT(rewrapClicked()));
 	connect(ui.weightLineEdit, SIGNAL(textChanged(const QString &)), this,
 			SLOT(weight_check()));
 	connect(ui.productiontableWidget, SIGNAL(pressed(const QModelIndex &)),
 			this, SLOT(rowClickedSelProd(const QModelIndex &)));
-	//connect(ui.pushDelPro, SIGNAL(clicked()), this, SLOT(delprobycell()));
-    connect(this->timer1,SIGNAL(timeout()),this,SLOT(timer1_v()));
-    connect(this->timer2,SIGNAL(timeout()),this,SLOT(timer2_v()));
+
     connect(ui.dummycheckBox,SIGNAL(clicked()),this,SLOT(dummycheckpressed()));
 
-/*
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
-    {
-         qDebug() << "Name        : " << info.portName();
-         qDebug() << "Description : " << info.description();
-         qDebug() << "Manufacturer: " << info.manufacturer();
-
-         // Example use QSerialPort
-         QSerialPort serial;
-         serial.setPort(info);
-         if (serial.open(QIODevice::ReadWrite))
-             serial.close();
-     }
-*/
 
 
-    timer1->start(60000);
+
 }
 
 Elina_Labels::~Elina_Labels() {
 
 }
 
-void Elina_Labels::setupModel_Code(QString like) {
+void Elina_Labels::setupModel_Code(const QString &like) {
 	QString
 			query =
 					("SELECT kodikos_p,perigrafi FROM telika_proionta where kodikos_p like \'%");
@@ -206,41 +175,16 @@ void Elina_Labels::setupModel_Code(QString like) {
 	}
 	query.append(" order by kodikos_p");
 
-	QSqlQuery qp;
-	QSqlQueryModel *model1 = new QSqlQueryModel;
-	//qp.prepare(query);
-	//QString result = codec->toUnicode( qp.value( 0 ).toString() );
-	qp.exec(query);
-    qDebug()<<"QUERY:"<<query;
-	model1->setQuery(qp);
+    QSqlQuery qp(*db1);
+    qp.exec(query);
+    qDebug()<<query;
+    qp.next();
+    qDebug()<<qp.value(0).toString();
+    model->setQuery(qp);
+    model->setHeaderData(0, Qt::Horizontal, trUtf8("Κωδικός"));
+    model->setHeaderData(1, Qt::Horizontal, trUtf8("Περιγραφή"));
 
-	//		while (model1->canFetchMore())
-	//		model1->fetchMore();
-	//		int i = model1->rowCount();
-	//		for (int k=0;k< i-1;k++)
-	//		{
-	//			QSqlRecord record=model1->record(k);
-	//			QString jim5=record.value(0).toString();
-	//            int jim6=jim5.length();
-	//			QString jim1=codec->toUnicode(record.value(0).toByteArray());
-	//			QString jim2=codec->toUnicode(record.value(1).toByteArray());
-	//			QString jim3=decoder->toUnicode(record.value(0).toByteArray());
-	//			QString jim4=decoder->toUnicode(record.value(1).toByteArray());
 
-	//QString jim=codec->toUnicode(QVariant::ByteArray(QVariant(record.value(0).toString())));
-	//			qDebug() << "Date:" << jim1 << jim2 << jim3 << jim4 << jim5 ;
-
-	//			record.value(0)=QVariant(codec->toUnicode(record.value(0).toByteArray()));
-	//			record.value(1)=QVariant(codec->toUnicode(record.value(1).toByteArray()));
-	//cout<<record.value(2);
-	//index->i
-	//		}
-	//model1->setQuery(codec->toUnicode(resultqp.value( 0 ).toString() ));
-	model1->setHeaderData(0, Qt::Horizontal, trUtf8("Κωδικός"));
-	model1->setHeaderData(1, Qt::Horizontal, trUtf8("Περιγραφή"));
-	//    	QSqlError jim=db.lastError();
-	//    	qDebug()<<jim;
-	model = model1;
 
 }
 
@@ -305,41 +249,18 @@ void Elina_Labels::next1Clicked() {
 	if (final_check(f_code) == FALSE)
 		return;
 
-	if (kefcheck == FALSE)
-		return;
+
 
 	QString code_t = get_code_t(f_code);
 
-    ////ΑΛΛΑΓΗ 7/8/2012 ΕΛΕΓΧΟΣ ΔΙΠΛΟΥ Κ/Τ
-    QSqlQuery query999(*db1);
-    QString qr99,qr100;
-    qr99="select * from production where code_t='"+code_t+"'";
-    qr100="select * from production_dummy where code_t='"+code_t+"'";
-    qDebug()<<qr99;
-    qDebug()<<qr100;
-    query999.exec(qr99);
-    if (query999.next())
-    {
-        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-                "Aυτός ο Κ/Τ υπάρχει ήδη. Η ετικέτα δεν θα εκτυπωθεί"));
-        return;
-    }
-
-
-    query999.exec(qr100);
-    if (query999.next())
-    {
-        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-                "Aυτός ο Κ/Τ έχει ήδη εκτυπωθεί σαν dummy. Η ετικέτα δεν θα εκτυπωθεί"));
-        return;
-    }
-   //ΤΕΛΟΣ ΑΛΛΑΓΗΣ 8/7/2012
+    //TODO
+    bool dupCodeT=checkDoubleCodeT(code_t);
 
     print_label(code_t, f_code);
     //if (f_code.left(1)!="E")
-    insert_db_prod(f_code);
+    insert_db_prod(code_t,f_code);
     qDebug()<<"K?T:"<<code_t;
-	insert_kef(code_t);
+
 
 	disable_entry_controls();
 	ui.dummycheckBox->setCheckState(Qt::Unchecked);
@@ -348,8 +269,9 @@ void Elina_Labels::next1Clicked() {
 
 }
 
+//TODO Check existence of code in erp
 void Elina_Labels::check_kef_code(QString f_code) {
-
+    /*
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_4_1);
@@ -364,107 +286,17 @@ void Elina_Labels::check_kef_code(QString f_code) {
 	out1 << quint16(0xFFFF);
 	client->write(block1);
 	ui.pushDelPro->setEnabled(FALSE);
-
+*/
 }
 
-QString Elina_Labels::insert_db_prod(QString f_code) {
-	QString middle_2, middle_3;
-
-	QString weight = ui.weightLineEdit->text();
-
-	QString middle = ui.machinespinBox->text()
-			+ ui.middleDateEdit->text().remove("/") + ui.aaSpinBox->text();
-	if (ui.aaSpinBox_2->isVisible() == TRUE) {
-		middle_2 = ui.machinespinBox_2->text()
-				+ ui.middleDateEdit_2->text().remove("/")
-				+ ui.aaSpinBox_2->text();
-	}
-	if (ui.aaSpinBox_3->isVisible() == TRUE) {
-		middle_3 = ui.machinespinBox_3->text()
-				+ ui.middleDateEdit_3->text().remove("/")
-				+ ui.aaSpinBox_3->text();
-	}
-	QString qual, qual1;
-	switch (ui.qualCombo->currentIndex()) {
-	case 0:
-		qual = "1A";
-		qual1 = "X";
-		break;
-	case 1:
-		qual = "2A";
-		qual1 = "Y";
-		break;
-    case 2:
-		qual = "3A";
-		qual1 = "Z";
-		break;
-	case 3:
-        qual = "A";
-        qual1 = "A";
-		break;
-    //case 4:
-        //qual = "K/Z";
-        //qual1 = "K";
-
-        break;
-	}
-
-	switch (ui.weightLineEdit->text().length()) {
-	case 1:
-		weight = "00" + ui.weightLineEdit->text();
-		break;
-	case 2:
-		weight = "0" + ui.weightLineEdit->text();
-		break;
-	case 3:
-		weight = ui.weightLineEdit->text();
-		break;
-
-	}
-
-	QSqlQuery query(*db1);
-	QDateTime pr_date = QDateTime::currentDateTime();
-	QDateTime nextdate = pr_date.addDays(1);
-	QString code = ui.lineEdit->text();
-	QString f_aa = "SELECT COUNT(*) from PRODUCTION where f_code='" + f_code
-			+ "' and middle='" + middle + "'";
-	query.exec(f_aa);
-	query.first();
-
-	QString day_aa;
-
-	QVariant a;
-
-    a = query.value(0).toInt() ;
-
-    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
-            + "' and middle='" + middle + "'";
-    query.exec(f_aa);
-    query.first();
-
-    a=a.toInt()+query.value(0).toInt()+1;
-
-
-	day_aa = a.toString();
+QString Elina_Labels::insert_db_prod(const QString &code_t,const QString &f_code) {
 
 
 
-	if (day_aa.length() == 1)
-		day_aa = "0" + day_aa;
 
 
+    QSqlQuery query(*db1);
 
-    // ELEGXOS IF IS DUMMY
-
-    if (ui.dummycheckBox->checkState()==1)
-    {
-
-        middle = ui.machinespinBox->text()
-                    + ui.dummyProdDate->text().remove("/") + ui.aaSpinBox->text();
-    }
-
-    // TELOS ELEGXOY IF IS DUMMY
-	QString code_t = weight + middle + qual1 + day_aa;
 	QTime ct = QTime::currentTime();
 
 	int hr = ct.hour();
@@ -478,94 +310,53 @@ QString Elina_Labels::insert_db_prod(QString f_code) {
 	if (hr < 6)
 		vardia = "C";
 
+    QString isDummy=  (ui.dummycheckBox->checkState() == 0) ? "0":"1";
+    QString weight = ui.weightLineEdit->text();
+    QString qual;
+    switch (ui.qualCombo->currentIndex()) {
+    case 0:
+        qual = "1A";
+        break;
+    case 1:
+        qual = "2A";
+        break;
+    case 2:
+        qual = "3A";
+        break;
+    case 3:
+        qual = "A";
+        break;
 
-	if (ui.dummycheckBox->checkState() == 0) {
-        if (qual!="A")
-        {
+    }
+
+    QString middle = get_middle();
+    QString middle_2 = get_middle2();
+    QString middle_3 = get_middle3();
+
+
+
 
 		QString
 				insert =
-						"INSERT INTO PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
+                        "INSERT INTO PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isErp,code_t,middle_2,middle_3,"\
+                "vardia,is_dummy,is_deleted) VALUES ("
 								+ weight + ",'" + qual + "','" + middle + "',"
 								+ ui.aaSpinBox->text() + ",'"
 								+ QDateTime::currentDateTime().toString(
 										Qt::ISODate) + "','" + f_code + "',0,'"
 								+ code_t + "','" + middle_2 + "','" + middle_3
-								+ "','" + vardia + "')";
+                                + "','" + vardia + "',"+ isDummy+",0)";
 
 		query.exec(insert);
         qDebug()<<insert;
 		refresh_production();
-        }
-        
-        if (qual=="A")
-        {
-		QString
-				insert =
-                        "INSERT INTO PRODUCTION_dummy(weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
-								+ weight + ",'" + qual + "','" + middle + "',"
-								+ ui.aaSpinBox->text() + ",'"
-								+ QDateTime::currentDateTime().toString(
-										Qt::ISODate) + "','" + f_code + "',0,'"
-								+ code_t + "','" + middle_2 + "','" + middle_3
-								+ "','" + vardia + "')";
 
-		query.exec(insert);
-		refresh_production();
-        }
-
-	}
-	else
-	{
-        vardia=ui.dummyVardiaCombo->currentText();
-		QString
-						insert =
-								"INSERT INTO PRODUCTION_dummy (weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
-										+ weight + ",'" + qual + "','" + middle + "',"
-										+ ui.aaSpinBox->text() + ",'"
-										+ QDateTime::currentDateTime().toString(
-												Qt::ISODate) + "','" + f_code + "',0,'"
-										+ code_t + "','" + middle_2 + "','" + middle_3
-										+ "','" + vardia + "')";
-
-				query.exec(insert);
-	}
 	ui.pushDelPro->setEnabled(FALSE);
 	return code_t;
 
 }
 
-void Elina_Labels::insert_kef(QString code_t) {
-    if (code_t.contains("A"))
-            return;
-	QString pid, code, vardia;
-	QSqlQuery query(*db1);
-    QString querystr="select id,f_code,vardia from production where code_t='"+ code_t + "'";
-    query.exec(querystr);
-    qDebug()<<querystr;
-	query.last();
-	code = query.value(1).toString();
-	pid = query.value(0).toString();
-	vardia = query.value(2).toString();
 
-	QByteArray block;
-	QDataStream out(&block, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_1);
-	QString req_type = "KFINSERT";
-	out << quint16(0) << req_type << code_t << code << pid << vardia;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
-	client->write(block);
-	QByteArray block1;
-	QDataStream out1(&block, QIODevice::WriteOnly);
-	out1.setVersion(QDataStream::Qt_4_1);
-	out1 << quint16(0xFFFF);
-	client->write(block1);
-	ui.pushDelPro->setEnabled(FALSE);
-	ui.scanlineEdit->setText("");
-	ui.scanlineEdit->setFocus();
-
-}
 
 bool Elina_Labels::final_check(QString f_code) {
 	//disable_entry_controls();
@@ -600,11 +391,6 @@ bool Elina_Labels::final_check(QString f_code) {
 		return FALSE;
 	}
 
-	//if (ui.prodLabel->text() == "") {
-	//	QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-	//				"Δεν βρέθηκε η προδιαγραφή"));
-	//	return FALSE;
-	//}
 
 	if (ui.qualCombo->currentIndex() == -1) {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
@@ -642,13 +428,7 @@ bool Elina_Labels::final_check(QString f_code) {
 			return FALSE;
 		}
 
-		if (ui.aaSpinBox->text() == ui.aaSpinBox_2->text()
-				&& ui.machinespinBox_2->text() == ui.machinespinBox_3->text()
-				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
-			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-            //return FALSE;
-		}
+
 
 	}
 	if (f_code.mid(10, 1).toInt() == 3) {
@@ -664,21 +444,9 @@ bool Elina_Labels::final_check(QString f_code) {
 			return FALSE;
 		}
 
-		if (ui.aaSpinBox_2->text() == ui.aaSpinBox_3->text()
-				&& ui.machinespinBox_2->text() == ui.machinespinBox_3->text()
-				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
-			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-            //return FALSE;
-		}
 
-		if (ui.aaSpinBox->text() == ui.aaSpinBox_3->text()
-				&& ui.machinespinBox_2->text() == ui.machinespinBox_3->text()
-				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
-			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-            //return FALSE;
-		}
+
+
 		if (ui.aaSpinBox->text() == ui.aaSpinBox_2->text()
 				&& ui.machinespinBox_2->text() == ui.machinespinBox_3->text()
 				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
@@ -880,7 +648,7 @@ void Elina_Labels::removeClicked() {
 }
 
 void Elina_Labels::upClicked() {
-	qDebug() << row_sel;
+
 	if (row_sel >= 1) {
 		QTableWidgetItem *c = ui.codeTableWidget->item(row_sel, 0);
 		QTableWidgetItem *d = ui.codeTableWidget->item(row_sel, 1);
@@ -1039,7 +807,7 @@ void Elina_Labels::refresh_production() {
 
 	QString
 			a =
-                    "SELECT pr_date,f_code,weight,code_t,iskef,quality,vardia from production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
+                    "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
 	query.exec(a);
 	int r = 0;
     qDebug()<<"Q:"<<query.size();
@@ -1047,52 +815,44 @@ void Elina_Labels::refresh_production() {
 	while (query.next() != FALSE) {
 		ui.productiontableWidget->setRowCount(r + 1);
 		QTableWidgetItem *j = new QTableWidgetItem;
-		//j->setFlags(Qt::ItemIsSelectable);
+
 		j->setText(query.value(0).toString());
 		j->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//j->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			j->setBackgroundColor(QColor(Qt::red));
 		}
 		ui.productiontableWidget->setItem(r, 0, j);
 
 		QTableWidgetItem *k = new QTableWidgetItem;
-		//k->setFlags(Qt::ItemIsSelectable);
+
 		k->setText(query.value(1).toString());
 		k->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//k->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			k->setBackgroundColor(QColor(Qt::red));
 		}
 		ui.productiontableWidget->setItem(r, 1, k);
 
 		QTableWidgetItem *l = new QTableWidgetItem;
-		//l->setFlags(Qt::ItemIsSelectable);
+
 		l->setText(query.value(2).toString());
 		l->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//l->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			l->setBackgroundColor(QColor(Qt::red));
 		}
 		ui.productiontableWidget->setItem(r, 2, l);
 
 		QTableWidgetItem *m = new QTableWidgetItem;
-		//m->setFlags(Qt::ItemIsSelectable);
+
 		m->setText(query.value(3).toString());
 		m->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//m->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "K/Z") {
 			m->setBackgroundColor(QColor(Qt::red));
 		}
@@ -1110,35 +870,29 @@ void Elina_Labels::refresh_production() {
 			u->setEnabled(FALSE);
 			u->setCheckState(Qt::Checked);
 		}
-		//if (query.value(5).toString()=="K/Z"){
-		//n->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			n->setBackgroundColor(QColor(Qt::red));
 		}
-		//		n->setFlags(Qt::ItemIsSelectable);
+
 
 		QTableWidgetItem *o = new QTableWidgetItem;
-		//	o->setFlags(Qt::ItemIsSelectable);
+
 		o->setText(query.value(5).toString());
 		o->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//o->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			o->setBackgroundColor(QColor(Qt::red));
 		}
 		ui.productiontableWidget->setItem(r, 5, o);
 
 		QTableWidgetItem *p = new QTableWidgetItem;
-		//p->setFlags(Qt::ItemIsSelectable);
+
 		p->setText(query.value(6).toString());
 		p->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-		//if (query.value(5).toString()=="K/Z"){
-		//p->setBackgroundColor(QColor(Qt::red));
-		//}
+
 		if (query.value(5).toString() == "X") {
 			p->setBackgroundColor(QColor(Qt::red));
 		}
@@ -1148,32 +902,12 @@ void Elina_Labels::refresh_production() {
 	}
 	ui.pushDelPro->setEnabled(FALSE);
 }
-//////////////////////////////////////////??EDO EIMAI//////////////////////////////
+
+
 void Elina_Labels::Scanned() {
-	QString code_t, pid, code;
+    QString code_t;
 	code_t = ui.scanlineEdit->text();
-	QSqlQuery query(*db1);
-	query.exec("select f_code from production where code_t='" + code_t + "'");
-	query.last();
-	code = query.value(0).toString();
-
-    query.exec("insert into production_deleted (weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia)(select weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia from production where code_t='"+code_t+"')");
-    query.exec("delete from production where code_t='" + code_t	+ "'");
-
-	QByteArray block;
-	QDataStream out(&block, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_1);
-	QString req_type = "KFDELETE";
-	out << quint16(0) << req_type << code_t << code;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
-	client->write(block);
-	QByteArray block1;
-	QDataStream out1(&block, QIODevice::WriteOnly);
-	out1.setVersion(QDataStream::Qt_4_1);
-	out1 << quint16(0xFFFF);
-	client->write(block1);
-
+    setDeleted(code_t);
 	ui.scanlineEdit->setText("");
 	ui.scanlineEdit->setEnabled(FALSE);
 	ui.checkBox->setChecked(FALSE);
@@ -1213,22 +947,10 @@ void Elina_Labels::enable_entry_controls() {
 }
 
 void Elina_Labels::setSpinBoxFormat() {
-	if (ui.aaSpinBox->value() < 10) {
-		ui.aaSpinBox->setPrefix("0");
-	} else {
-		ui.aaSpinBox->setPrefix("");
-	}
-	if (ui.aaSpinBox_2->value() < 10) {
-		ui.aaSpinBox_2->setPrefix("0");
-	} else {
-		ui.aaSpinBox_2->setPrefix("");
-	}
-	if (ui.aaSpinBox_3->value() < 10) {
-		ui.aaSpinBox_3->setPrefix("0");
-	} else {
-		ui.aaSpinBox_3->setPrefix("");
-	}
-	ui.pushDelPro->setEnabled(FALSE);
+    (ui.aaSpinBox->value() < 10) ? ui.aaSpinBox->setPrefix("0"):ui.aaSpinBox->setPrefix("");
+    (ui.aaSpinBox_2->value() < 10) ? ui.aaSpinBox_2->setPrefix("0"):ui.aaSpinBox_2->setPrefix("");
+    (ui.aaSpinBox_3->value() < 10) ? ui.aaSpinBox_3->setPrefix("0"):ui.aaSpinBox_3->setPrefix("");
+     ui.pushDelPro->setEnabled(FALSE);
 
 }
 
@@ -1252,68 +974,67 @@ void Elina_Labels::copy_middledate() {
 }
 
 QString Elina_Labels::get_code_t(QString f_code) {
-	QSqlQuery query(*db1);
-	QString middle = get_middle();
-	QString f_aa = "SELECT COUNT(*) from PRODUCTION where f_code='" + f_code
-			+ "' and middle='" + middle + "'";
-	query.exec(f_aa);
-	query.first();
-	QString day_aa;
-	QVariant a;
-    a = query.value(0).toInt();
+    QString middle_2, middle_3;
+
+        QString weight = ui.weightLineEdit->text();
+
+        QString middle = get_middle();
+
+        QString qual, qual1;
+        switch (ui.qualCombo->currentIndex()) {
+        case 0:
+            qual = "1A";
+            qual1 = "X";
+            break;
+        case 1:
+            qual = "2A";
+            qual1 = "Y";
+            break;
+        case 2:
+            qual = "3A";
+            qual1 = "Z";
+            break;
+        case 3:
+            qual = "A";
+            qual1 = "A";
+            break;
+        //case 4:
+            //qual = "K/Z";
+            //qual1 = "K";
+
+            break;
+        }
+
+        switch (ui.weightLineEdit->text().length()) {
+        case 1:
+            weight = "00" + ui.weightLineEdit->text();
+            break;
+        case 2:
+            weight = "0" + ui.weightLineEdit->text();
+            break;
+        case 3:
+            weight = ui.weightLineEdit->text();
+            break;
+
+        }
 
 
-    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + f_code
-            + "' and middle='" + middle + "'";
-    query.exec(f_aa);
-    query.first();
-
-    a=a.toInt()+query.value(0).toInt()+1;
-
-
-    day_aa = a.toString();
 
 
 
+        // ELEGXOS IF IS DUMMY
 
-	if (day_aa.length() == 1)
-		day_aa = "0" + day_aa;
+        if (ui.dummycheckBox->checkState()==1)
+        {
 
-	QString weight;
-	QString qual1;
-	switch (ui.qualCombo->currentIndex()) {
-	case 0:
-		qual1 = "X";
-		break;
-	case 1:
-		qual1 = "Y";
-		break;
-	case 2:
-		qual1 = "Z";
-		break;
-    //case 3:
-        //qual1 = "-";
-        //break;
-    case 3:
-        qual1 = "A";
+            middle = ui.machinespinBox->text()
+                        + ui.dummyProdDate->text().remove("/") + ui.aaSpinBox->text();
+        }
 
-		break;
-	}
+        QString aa=createAa(middle,f_code);
 
-	switch (ui.weightLineEdit->text().length()) {
-	case 1:
-		weight = "00" + ui.weightLineEdit->text();
-		break;
-	case 2:
-		weight = "0" + ui.weightLineEdit->text();
-		break;
-	case 3:
-		weight = ui.weightLineEdit->text();
-		break;
-
-	}
-
-	QString code_t = weight + middle + qual1 + day_aa;
+        // TELOS ELEGXOY IF IS DUMMY
+        QString code_t = weight + middle + qual1 + aa;
 	return code_t;
 }
 
@@ -1336,58 +1057,11 @@ QString Elina_Labels::get_middle3() {
 
 }
 
-void Elina_Labels::startread() {
-	QDataStream in(client);
-	in.setVersion(QDataStream::Qt_4_1);
-	nextblocksize = 0;
-	QSqlQuery query(*db1);
 
-	forever {
-		if (nextblocksize == 0) {
-			if (client->bytesAvailable() < sizeof(quint16))
-				return;
-			in >> nextblocksize;
-			qDebug() << nextblocksize;
-
-		}
-
-		if (nextblocksize == 0xFFFF) {
-
-			return;
-		}
-
-		if (client->bytesAvailable() < nextblocksize)
-			return;
-		QString req_type;
-		in >> req_type;
-
-		qDebug() << req_type;
-		if (req_type == "KFCHECK") {
-
-			QString reply, code;
-			in << reply << code;
-			if (reply == "0") {
-				QDate pr_date = QDate::currentDate();
-				QMessageBox::critical(this, qApp->trUtf8("Προσοχή"),
-						qApp->trUtf8("Ο κωδικός δεν βρέθηκε στο ΚΕΦ.\n"
-							"Πιέστε ΟΚ για συνέχεια."));
-				query.exec("insert into notfound (code,prdate) values ('"
-						+ code + "','" + pr_date.toString("MM-dd-yyyy") + "')");
-
-				this->kefcheck = FALSE;
-			}
-		}
-
-	}
-
-}
 
 void Elina_Labels::checkClicked() {
 	ui.pushDelPro->setEnabled(FALSE);
-	if (ui.checkBox->checkState() == 2)
-		ui.scanlineEdit->setEnabled(TRUE);
-	else
-		ui.scanlineEdit->setEnabled(FALSE);
+    (ui.checkBox->checkState() == 2) ? ui.scanlineEdit->setEnabled(TRUE) : ui.scanlineEdit->setEnabled(FALSE);
 
 }
 
@@ -1469,35 +1143,8 @@ void Elina_Labels::rowClickedSelProd(const QModelIndex &index) {
 		}
 		if (n.clickedButton() == acc1) {
 
-			QString pid, code;
-
-			QSqlQuery query(*db1);
-			query.exec("select f_code from production where code_t='" + code_t
-					+ "'");
-			query.last();
-			code = query.value(0).toString();
-
-            query.exec("insert into production_deleted (weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia)(select weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia from production where code_t='"+code_t+"')");
-			query.exec("delete from production where code_t='" + code_t	+ "'");
-			QByteArray block;
-			QDataStream out(&block, QIODevice::WriteOnly);
-			out.setVersion(QDataStream::Qt_4_1);
-			QString req_type = "KFDELETE";
-			out << quint16(0) << req_type << code_t << code;
-			out.device()->seek(0);
-			out << quint16(block.size() - sizeof(quint16));
-			client->write(block);
-			QByteArray block1;
-			QDataStream out1(&block, QIODevice::WriteOnly);
-			out1.setVersion(QDataStream::Qt_4_1);
-			out1 << quint16(0xFFFF);
-			client->write(block1);
-
-			//ui.scanlineEdit->setText("");
-			//ui.scanlineEdit->setEnabled(FALSE);
-			//ui.checkBox->setChecked(FALSE);
-
-			refresh_production();
+            setDeleted(code_t);
+            refresh_production();
 
 			return;
 
@@ -1511,36 +1158,8 @@ void Elina_Labels::rowClickedSelProd(const QModelIndex &index) {
 
 }
 
-void Elina_Labels::timer1_v()
-{
-    QSqlQuery query(*db1);
-    query.exec("SELECT top 1 iskef from production order by id desc");
-    query.next();
-    if (query.value(0).toInt()==0)
-    {
-        timer1->stop();
-        timer2->start(108000000);
-        QStringList to1;
-        QString from="linux@komotinipaper.gr";
-        to1.append("pg@komotinipaper.gr");
-        to1.append("mg@komotinipaper.gr");
-        to1.append("elefter@alfasoftware.gr");
-        QString subject="COMMUNICATION ERROR";
-        QString body="Η ΠΑΡΑΓΩΓΗ ΔΕΝ ΕΝΗΜΕΡΩΝΕΙ ΤΟ ΚΕΦΑΛΑΙΟ";
-        MailSender test1("localhost",from,to1, subject, body);
-        test1.setPriority(MailSender::high);
-        test1.send();
-
-    }
 
 
-}
-
-void Elina_Labels::timer2_v()
-{
-    timer2->stop();
-    timer1->start(60000);
-}
 
 void Elina_Labels::dummycheckpressed()
 {
@@ -1564,4 +1183,100 @@ void Elina_Labels::dummycheckpressed()
         ui.label_8->setVisible(FALSE);
         ui.label_9->setVisible(FALSE);
     }
+}
+
+bool Elina_Labels::checkDoubleCodeT(const QString &codeT)
+{
+    //TODO
+    QSqlQuery query(*db1);
+    QString q1,q2;
+    q1="select * from production where code_t='"+codeT+"'";
+    q2="select * from production_dummy where code_t='"+codeT+"'";
+    query.exec(q1);
+    if (query.next())
+    {
+        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                "Aυτός ο Κ/Τ υπάρχει ήδη. Η ετικέτα δεν θα εκτυπωθεί"));
+        return true;;
+    }
+
+
+    query.exec(q2);
+    if (query.next())
+    {
+        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                "Aυτός ο Κ/Τ έχει ήδη εκτυπωθεί σαν dummy. Η ετικέτα δεν θα εκτυπωθεί"));
+        return true;
+    }
+    return false;
+}
+
+void Elina_Labels::setDeleted(const QString &codeT)
+{
+    QSqlQuery query(*db1);
+    query.exec("update production set is_deleted=1 where code_t='" + codeT + "'");
+
+}
+
+QString Elina_Labels::createAa(const QString &middle, const QString &fCode)
+{
+    QSqlQuery query(*db1);
+    QString code = ui.lineEdit->text();
+    QString f_aa = "SELECT COUNT(*) from PRODUCTION where f_code='" + fCode
+            + "' and middle='" + middle + "'";
+    query.exec(f_aa);
+    query.first();
+    QString aa;
+    QVariant a;
+    a = query.value(0).toInt() ;
+    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + fCode
+            + "' and middle='" + middle + "'";
+    query.exec(f_aa);
+    query.first();
+    a=a.toInt()+query.value(0).toInt()+1;
+    aa = a.toString();
+    if (aa.length() == 1)
+        aa = "0" + aa;
+    return aa;
+
+}
+
+bool Elina_Labels::checkCodeA(const QString &code)
+{
+
+    QRegExp ka("\[AE]\\d{14,14}");
+
+    if (ka.exactMatch(code) == FALSE) {
+        QMessageBox m;
+
+        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
+        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
+        m.setStandardButtons(QMessageBox::Ok);
+        m.move(0, 100);
+        QFont serifFont("Times", 18, QFont::Bold);
+        m.setFont(serifFont);
+        m.exec();
+        return false;
+    }
+
+    return true;
+}
+
+bool Elina_Labels::checkCodeT(const QString &code)
+{
+    QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
+    if (kt.exactMatch(code) == FALSE) {
+        QMessageBox m;
+
+        m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
+        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
+        m.setStandardButtons(QMessageBox::Ok);
+        m.move(0, 100);
+        QFont serifFont("Times", 18, QFont::Bold);
+        m.setFont(serifFont);
+        m.exec();
+        return false;
+    }
+
+    return true;
 }

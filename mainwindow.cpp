@@ -29,43 +29,58 @@ mainWindow::mainWindow(QWidget *parent,int mode)
     QString dbhost=settings->value("dbhost").toString();
     QString dbuser=settings->value("dbuser").toString();
     QString dbpassword=settings->value("dbpassword").toString();
-    QString dbkef=settings->value("dbkef").toString();
+    QString dberp=settings->value("dberp").toString();
     QString dbext=settings->value("dbext").toString();
-    QString appserver=settings->value("appserver").toString();
-    //db=Προδιαγραφες   ----                db1=Production
-	db = QSqlDatabase::addDatabase("QTDS");
-    db.setDatabaseName(dbext);
-    db.setUserName(dbuser);
-    db.setPassword(dbpassword);
-    db.setHostName(dbhost);
-    qDebug()<<dbhost;
-    qDebug()<<dbext;
 
-	db1 = QSqlDatabase::addDatabase("QTDS","kef");
-    db1.setDatabaseName(dbkef);
+    //db=Προδιαγραφες   ----                db1=ERP
+	db = QSqlDatabase::addDatabase("QTDS");
+    db.setDatabaseName("elinaProdiagrafes");
+    db.setUserName("sa");
+    db.setPassword("sa");
+    db.setHostName("192.168.0.250");
+
+    db1 = QSqlDatabase::addDatabase("QTDS","erp");
+    //db1 = QSqlDatabase::addDatabase("QTDS");
+    db1.setDatabaseName(dberp);
     db1.setUserName(dbuser);
     db1.setPassword(dbpassword);
     db1.setHostName(dbhost);
-    qDebug()<<dbhost;
-    qDebug()<<dbkef;
-	db = QSqlDatabase::database();
-	db1 = QSqlDatabase::database("kef");
 
+    if (db.open() == false) {
+            QMessageBox::critical(0, "Error", "Error");
+            exit(0);
+        }
+    //db.open();
+    db1.open();
+
+    //db = QSqlDatabase::database();
+    //db1 = QSqlDatabase::database("erp");
+    //TODO      TESTING DB
+    QString
+            query =
+                    ("SELECT * FROM telika_proionta");
+
+
+    QSqlQuery qp;
+    bool success1= qp.prepare(query);
+    qDebug()<<"SU1:"<<success1;
+     bool success=qp.exec(query);
+     qDebug()<<qp.lastError().text();
+    qDebug()<<db.lastError().text();
+    qDebug()<<db1.lastError().text();
+    qDebug()<<"SU:"<<success;
+    qDebug()<<query;
+    qDebug()<<qp.lastError().text();
+    qp.next();
+    qDebug()<<qp.value(0).toString();
 	ui.setupUi(this);
-    QHostAddress addr((QString)appserver);
-	client = new QTcpSocket;
-	client->connectToHost(addr, 8889);
+    connect(ui.action, SIGNAL(triggered()), this, SLOT(labels()));
 
-
-	qDebug()<<"UI:"<<&ui;
-	connect(ui.action, SIGNAL(triggered()), this, SLOT(labels()));
-	qDebug()<<"ACTION:"<<&(ui.action_2);
 	connect(ui.action_2, SIGNAL(triggered()), this, SLOT(logout()));
 	connect(ui.actionProduction, SIGNAL(triggered()), this, SLOT(production_rep()));
 	connect(ui.action3A, SIGNAL(triggered()), this, SLOT(rep_3A()));
 	connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
     connect(ui.actionAbout,SIGNAL(triggered()),this,SLOT(about()));
-    //connect((ui.actionChangelog,SIGNAL(triggered())),this,SLOT(changelog()));
 
 
 	if (mode==1)
@@ -75,7 +90,7 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 			ui.action3A->setVisible(FALSE);
 			ui.actionK_T->setVisible(FALSE);
 
-			labels();
+            labels();
 		}
     qDebug()<<"db:"<<db.isOpen();
     qDebug()<<"db1:"<<db1.isOpen();
@@ -85,7 +100,7 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 
 mainWindow::~mainWindow()
 {
-	client->disconnectFromHost();
+
 	db.close();
 	db1.close();
 
@@ -94,7 +109,7 @@ mainWindow::~mainWindow()
 
 void mainWindow::labels()
 {
-	Elina_Labels *w= new Elina_Labels(this,&db,&db1,client);
+    Elina_Labels *w= new Elina_Labels(this,&db,&db1);
 
 	w->show();
 	w->move(0,0);

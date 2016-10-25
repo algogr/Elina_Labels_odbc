@@ -17,19 +17,12 @@
     */
 
 #include "rewrap.h"
+#include "elina_labels.h"
 
 rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
-	QDialog(parent) {
+    QDialog(parent),db1(db1) {
 	ui.setupUi(this);
-    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
-    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
 
-    QString appserver=settings->value("appserver").toString();
-
-	this->db1 = db1;
-    QHostAddress addr((QString) appserver);
-	client = new QTcpSocket;
-	client->connectToHost(addr, 8889);
     ui.lineAold->setFocus();
 	ui.label_new1->setVisible(FALSE);
 	ui.label_new2->setVisible(FALSE);
@@ -65,30 +58,20 @@ rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
 	connect(ui.lineNew5, SIGNAL(returnPressed()), this, SLOT(scanned_new5()));
 	connect(ui.pushCancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 	connect(ui.pushInsert, SIGNAL(clicked()), this, SLOT(insertClicked()));
-    delete settings;
+
 
 }
 
 rewrap::~rewrap() {
-	client->disconnectFromHost();
+
 
 }
 
 void rewrap::scanned_Aold() {
     QString scanned = ui.lineAold->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned))
+    {
         ui.lineAold->setText("");
         ui.lineAold->setFocus();
         return;
@@ -100,18 +83,9 @@ void rewrap::scanned_Aold() {
 void rewrap::scanned_old() {
 	QString scanned = ui.lineOld->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
-		ui.lineOld->setText("");
+    if (!Elina_Labels::checkCodeT(scanned))
+    {
+        ui.lineOld->setText("");
 		ui.lineOld->setFocus();
 		return;
 	}
@@ -124,17 +98,7 @@ void rewrap::scanned_Anew1() {
 
     QString scanned = ui.lineANew1->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned)) {
         ui.lineANew1->setText("");
         ui.lineANew1->setFocus();
         return;
@@ -150,32 +114,14 @@ void rewrap::scanned_Anew1() {
 void rewrap::scanned_new1() {
 	QString scanned = ui.lineNew1->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
-		ui.lineNew1->setText("");
+    if (! Elina_Labels::checkCodeT(scanned)) {
+        ui.lineNew1->setText("");
 		ui.lineNew1->setFocus();
 		return;
 	}
     if (ui.lineNew1->text()==ui.lineOld->text())
     {
-        QMessageBox m;
-
-        m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+        doubleread();
         ui.lineNew3->setText("");
         ui.lineNew3->setFocus();
         return;
@@ -193,17 +139,7 @@ void rewrap::scanned_new1() {
 void rewrap::scanned_Anew2() {
     QString scanned = ui.lineANew2->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned)) {
         ui.lineANew2->setText("");
         ui.lineANew2->setFocus();
         return;
@@ -222,17 +158,7 @@ void rewrap::scanned_Anew2() {
 void rewrap::scanned_new2() {
 	QString scanned = ui.lineNew2->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
+    if (! Elina_Labels::checkCodeT(scanned)) {
 		ui.lineNew2->setText("");
 		ui.lineNew2->setFocus();
 		return;
@@ -240,15 +166,7 @@ void rewrap::scanned_new2() {
 
     if (ui.lineNew2->text()==ui.lineOld->text() || ui.lineNew2->text()==ui.lineNew1->text())
     {
-        QMessageBox m;
-
-        m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+        doubleread();
         ui.lineNew2->setText("");
         ui.lineNew2->setFocus();
         return;
@@ -264,17 +182,7 @@ void rewrap::scanned_new2() {
 void rewrap::scanned_Anew3() {
     QString scanned = ui.lineANew3->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned)) {
         ui.lineANew3->setText("");
         ui.lineANew3->setFocus();
         return;
@@ -289,33 +197,15 @@ void rewrap::scanned_Anew3() {
 void rewrap::scanned_new3() {
 	QString scanned = ui.lineNew3->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
-		ui.lineNew3->setText("");
+if (! Elina_Labels::checkCodeT(scanned)) {
+        ui.lineNew3->setText("");
 		ui.lineNew3->setFocus();
 		return;
 	}
 
     if (ui.lineNew3->text()==ui.lineOld->text() || ui.lineNew3->text()==ui.lineNew1->text() || ui.lineNew3->text()==ui.lineNew2->text())
     {
-        QMessageBox m;
-
-        m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+        doubleread();
         ui.lineNew3->setText("");
         ui.lineNew3->setFocus();
         return;
@@ -335,17 +225,7 @@ void rewrap::scanned_new3() {
 void rewrap::scanned_Anew4() {
     QString scanned = ui.lineANew4->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/A"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned)) {
         ui.lineANew4->setText("");
         ui.lineANew4->setFocus();
         return;
@@ -362,33 +242,15 @@ void rewrap::scanned_Anew4() {
 void rewrap::scanned_new4() {
 	QString scanned = ui.lineNew4->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
-		ui.lineNew4->setText("");
+    if (! Elina_Labels::checkCodeT(scanned)) {
+        ui.lineNew4->setText("");
 		ui.lineNew4->setFocus();
 		return;
 	}
 
     if (ui.lineNew4->text()==ui.lineOld->text() || ui.lineNew4->text()==ui.lineNew1->text() || ui.lineNew4->text()==ui.lineNew2->text() || ui.lineNew4->text()==ui.lineNew3->text())
     {
-        QMessageBox m;
-
-        m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+        doubleread();
         ui.lineNew4->setText("");
         ui.lineNew4->setFocus();
         return;
@@ -404,17 +266,7 @@ void rewrap::scanned_new4() {
 void rewrap::scanned_Anew5() {
     QString scanned = ui.lineANew5->text();
 
-    QRegExp ka("\[AE]\\d{14,14}");
-    if (ka.exactMatch(scanned) == FALSE) {
-        QMessageBox m;
-
-        m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+    if (! Elina_Labels::checkCodeA(scanned)) {
         ui.lineANew5->setText("");
         ui.lineANew5->setFocus();
         return;
@@ -425,36 +277,20 @@ void rewrap::scanned_Anew5() {
 }
 
 
+
+
 void rewrap::scanned_new5() {
 	QString scanned = ui.lineNew5->text();
 
-	QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-	if (kt.exactMatch(scanned) == FALSE) {
-		QMessageBox m;
-
-		m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));
-		m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-		m.setStandardButtons(QMessageBox::Ok);
-		m.move(0, 100);
-		QFont serifFont("Times", 18, QFont::Bold);
-		m.setFont(serifFont);
-		m.exec();
-		ui.lineNew5->setText("");
+    if (! Elina_Labels::checkCodeT(scanned)) {
+        ui.lineNew5->setText("");
 		ui.lineNew5->setFocus();
 		return;
 	}
 
     if (ui.lineNew5->text()==ui.lineOld->text() || ui.lineNew5->text()==ui.lineNew1->text() || ui.lineNew5->text()==ui.lineNew2->text() || ui.lineNew5->text()==ui.lineNew3->text() || ui.lineNew5->text()==ui.lineNew4->text() )
     {
-        QMessageBox m;
-
-        m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
-        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
-        m.setStandardButtons(QMessageBox::Ok);
-        m.move(0, 100);
-        QFont serifFont("Times", 18, QFont::Bold);
-        m.setFont(serifFont);
-        m.exec();
+        doubleread();
         ui.lineNew5->setText("");
         ui.lineNew5->setFocus();
         return;
@@ -462,6 +298,19 @@ void rewrap::scanned_new5() {
     }
 
 
+}
+
+void rewrap::doubleread()
+{
+    QMessageBox m;
+
+    m.setText(trUtf8("O K/T έχει ξαναδιαβαστεί"));
+    m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
+    m.setStandardButtons(QMessageBox::Ok);
+    m.move(0, 100);
+    QFont serifFont("Times", 18, QFont::Bold);
+    m.setFont(serifFont);
+    m.exec();
 }
 
 void rewrap::insertClicked() {
@@ -529,22 +378,6 @@ void rewrap::insertClicked() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	QStringList new_codes = (QStringList() << ui.lineNew1->text()
 			<< ui.lineNew2->text() << ui.lineNew3->text()
 			<< ui.lineNew4->text() << ui.lineNew5->text());
@@ -565,68 +398,28 @@ void rewrap::cancelClicked() {
 
 void rewrap::insert_production(QString old_code, QStringList new_codes,QString old_acode,QStringList new_acodes) {
 	QSqlQuery query(*db1);
-	query.exec(
-			"select top 1 id,pr_date,vardia,f_code,middle,middle_2,middle_3 from production where code_t='"
-					+ old_code + "'");
+    query.exec(	"select top 1 pr_date from production where code_t='"+ old_code + "'");
 	query.next();
-	QString id = query.value(0).toString();
-	QString pr_date = query.value(1).toString();
-	QString vardia = query.value(2).toString();
-    //QString f_code = query.value(3).toString();
-	QString middle = query.value(4).toString();
-	QString middle_2 = query.value(5).toString();
-	QString middle_3 = query.value(6).toString();
 
-	query.exec("DELETE from production where code_t='"+old_code+"'");
-    QString last_record="0";
+    QString pr_date = query.value(0).toString();
 
-    int ls= new_codes.indexOf(NULL)-1;
 
-    if (ls==-1 )
-        ls=4;
-	for (int q = 0; q < new_codes.size(); ++q) {
+
+
+    for (int q = 0; q < new_codes.size(); ++q) {
 		QString code_t = new_codes.value(q);
         QString code_a = new_acodes.value(q);
-		if (code_t != "") {
-			QString weight = code_t.left(3);
-			QString qual = code_t.mid(12, 1);
-            if (qual=="X")
-                qual="1A";
-            if (qual=="Y")
-                qual="2A";
-            if (qual=="Z")
-                qual="3A";
-
-			QString aa = code_t.mid(11, 1);
-			query.exec(
-					"INSERT INTO PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isKef,code_t,middle_2,middle_3,vardia) VALUES ("
-							+ weight + ",'" + qual + "','" + middle + "'," + aa
-                            + ",'" + pr_date + "','" + code_a + "',0,'"
-							+ code_t + "','" + middle_2 + "','" + middle_3
-							+ "','" + vardia + "')");
-			query.exec("select top 1 id from production where code_t='"+ code_t + "'");
-			query.next();
-			QString pid = query.value(0).toString();
-
-			QByteArray block;
-			QDataStream out(&block, QIODevice::WriteOnly);
-			out.setVersion(QDataStream::Qt_4_1);
-			QString req_type = "KFREWRAP";
-
-
-            if (q==ls)
-                last_record="1";
-            out << quint16(0) << req_type << old_code << code_t << old_acode << code_a << pid	<< vardia << last_record;
-            out.device()->seek(0);
-			out << quint16(block.size() - sizeof(quint16));
-			client->write(block);
-			QByteArray block1;
-			QDataStream out1(&block, QIODevice::WriteOnly);
-			out1.setVersion(QDataStream::Qt_4_1);
-			out1 << quint16(0xFFFF);
-			client->write(block1);
+        query.prepare("INSERT INTO rewrap (oldcode_a,oldcode_t,newcode_a,newcode_t,rewrap_date,pr_date_oldcode) VALUES (?,?,?,?,?,?)");
+        query.addBindValue(old_acode);
+        query.addBindValue(old_code);
+        query.addBindValue(code_a);
+        query.addBindValue(code_t);
+        query.addBindValue(old_acode);
+        query.addBindValue(QDateTime::currentDateTime().toString(Qt::ISODate)) ;
+        query.addBindValue(pr_date);
+        query.exec();
 
 		}
 
 	}
-}
+

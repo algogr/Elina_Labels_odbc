@@ -666,6 +666,9 @@
    <property name="text">
     <string>Ανατύλιξη</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+G</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushDelPro">
    <property name="geometry">
