@@ -19,8 +19,8 @@
 #ifndef R3A_H
 #define R3A_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QCheckBox>
+#include <QDialog>
+#include <QCheckBox>
 #include <QtSql>
 #include "mainwindow.h"
 #include "ui_r3a.h"

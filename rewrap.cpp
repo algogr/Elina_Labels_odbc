@@ -20,27 +20,27 @@
 #include "elina_labels.h"
 
 rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
-    QDialog(parent),db1(db1) {
+    QDialog(parent),db1(db1),isDummy(true) {
 	ui.setupUi(this);
 
     ui.lineAold->setFocus();
-	ui.label_new1->setVisible(FALSE);
-	ui.label_new2->setVisible(FALSE);
-	ui.label_new3->setVisible(FALSE);
-	ui.label_new4->setVisible(FALSE);
-	ui.label_new5->setVisible(FALSE);
-    ui.lineANew1->setVisible(FALSE);
-    ui.lineANew2->setVisible(FALSE);
-    ui.lineANew3->setVisible(FALSE);
-    ui.lineANew4->setVisible(FALSE);
-    ui.lineANew5->setVisible(FALSE);
-	ui.lineNew1->setVisible(FALSE);
-	ui.lineNew2->setVisible(FALSE);
-	ui.lineNew3->setVisible(FALSE);
-	ui.lineNew4->setVisible(FALSE);
-	ui.lineNew5->setVisible(FALSE);
-	ui.pushCancel->setEnabled(FALSE);
-	ui.pushInsert->setEnabled(FALSE);
+    ui.label_new1->setVisible(false);
+    ui.label_new2->setVisible(false);
+    ui.label_new3->setVisible(false);
+    ui.label_new4->setVisible(false);
+    ui.label_new5->setVisible(false);
+    ui.lineANew1->setVisible(false);
+    ui.lineANew2->setVisible(false);
+    ui.lineANew3->setVisible(false);
+    ui.lineANew4->setVisible(false);
+    ui.lineANew5->setVisible(false);
+    ui.lineNew1->setVisible(false);
+    ui.lineNew2->setVisible(false);
+    ui.lineNew3->setVisible(false);
+    ui.lineNew4->setVisible(false);
+    ui.lineNew5->setVisible(false);
+    ui.pushCancel->setEnabled(false);
+    ui.pushInsert->setEnabled(false);
 	ui.pushCancel->setFocusPolicy(Qt::NoFocus);
 	ui.pushInsert->setFocusPolicy(Qt::NoFocus);
 	connect(ui.lineOld, SIGNAL(returnPressed()), this, SLOT(scanned_old()));
@@ -89,8 +89,8 @@ void rewrap::scanned_old() {
 		ui.lineOld->setFocus();
 		return;
 	}
-	ui.label_new1->setVisible(TRUE);
-    ui.lineANew1->setVisible(TRUE);
+    ui.label_new1->setVisible(true);
+    ui.lineANew1->setVisible(true);
     ui.lineANew1->setFocus();
 }
 
@@ -103,8 +103,8 @@ void rewrap::scanned_Anew1() {
         ui.lineANew1->setFocus();
         return;
     }
-    ui.label_new1->setVisible(TRUE);
-    ui.lineNew1->setVisible(TRUE);
+    ui.label_new1->setVisible(true);
+    ui.lineNew1->setVisible(true);
     ui.lineNew1->setFocus();
 
 }
@@ -128,11 +128,14 @@ void rewrap::scanned_new1() {
 
     }
 
-	ui.label_new2->setVisible(TRUE);
-    ui.lineANew2->setVisible(TRUE);
+    checkDummy(scanned);
+
+
+    ui.label_new2->setVisible(true);
+    ui.lineANew2->setVisible(true);
     ui.lineANew2->setFocus();
-	ui.pushCancel->setEnabled(TRUE);
-	ui.pushInsert->setEnabled(TRUE);
+    ui.pushCancel->setEnabled(true);
+    ui.pushInsert->setEnabled(true);
 }
 
 
@@ -145,7 +148,7 @@ void rewrap::scanned_Anew2() {
         return;
     }
 
-    ui.lineNew2->setVisible(TRUE);
+    ui.lineNew2->setVisible(true);
     ui.lineNew2->setFocus();
 }
 
@@ -173,8 +176,14 @@ void rewrap::scanned_new2() {
 
     }
 
-	ui.label_new3->setVisible(TRUE);
-    ui.lineANew3->setVisible(TRUE);
+    checkDummy(scanned);
+
+
+
+
+
+    ui.label_new3->setVisible(true);
+    ui.lineANew3->setVisible(true);
     ui.lineANew3->setFocus();
 }
 
@@ -189,7 +198,7 @@ void rewrap::scanned_Anew3() {
     }
 
 
-    ui.lineNew3->setVisible(TRUE);
+    ui.lineNew3->setVisible(true);
     ui.lineNew3->setFocus();
 }
 
@@ -212,12 +221,12 @@ if (! Elina_Labels::checkCodeT(scanned)) {
 
     }
 
+    checkDummy(scanned);
 
 
 
-
-    ui.label_new4->setVisible(TRUE);
-    ui.lineANew4->setVisible(TRUE);
+    ui.label_new4->setVisible(true);
+    ui.lineANew4->setVisible(true);
     ui.lineANew4->setFocus();
 }
 
@@ -234,7 +243,7 @@ void rewrap::scanned_Anew4() {
 
 
 
-    ui.lineNew4->setVisible(TRUE);
+    ui.lineNew4->setVisible(true);
     ui.lineNew4->setFocus();
 }
 
@@ -257,9 +266,12 @@ void rewrap::scanned_new4() {
 
     }
 
+    checkDummy(scanned);
 
-	ui.label_new5->setVisible(TRUE);
-    ui.lineANew5->setVisible(TRUE);
+
+
+    ui.label_new5->setVisible(true);
+    ui.lineANew5->setVisible(true);
     ui.lineANew5->setFocus();
 }
 
@@ -272,7 +284,7 @@ void rewrap::scanned_Anew5() {
         return;
     }
 
-    ui.lineNew5->setVisible(TRUE);
+    ui.lineNew5->setVisible(true);
     ui.lineNew5->setFocus();
 }
 
@@ -297,7 +309,7 @@ void rewrap::scanned_new5() {
 
     }
 
-
+    checkDummy(scanned);
 }
 
 void rewrap::doubleread()
@@ -312,6 +324,8 @@ void rewrap::doubleread()
     m.setFont(serifFont);
     m.exec();
 }
+
+
 
 void rewrap::insertClicked() {
 	int newWeight = 0;
@@ -375,17 +389,57 @@ void rewrap::insertClicked() {
         }
     }
 
+    if (!isDummy)
+    {
+        QMessageBox m;
+
+        m.setText(trUtf8("ΟΙ ΕΤΙΚΕΤΕΣ ΔΕΝ ΕΧΟΥΝ ΕΚΤΥΠΩΘΕΙ ΣΑΝ DUMMY! ΘΕΛΕΤΕ ΝΑ ΣΥΝΕΧΙΣΕΤΕ;"));
+        m.setWindowTitle(trUtf8("ΠΡΟΣΟΧΗ!!!"));
+        QAbstractButton *acc1 = m.addButton(trUtf8("Ναί"),
+                QMessageBox::ActionRole);
+        QAbstractButton *rej1 = m.addButton(trUtf8("Όχι"),
+                QMessageBox::ActionRole);
+        m.move(0, 100);
+
+        m.setDefaultButton((QPushButton*)rej1);
+        QFont serifFont("Times", 18, QFont::Bold);
+        m.setFont(serifFont);
+
+        m.exec();
+        if (m.clickedButton() == rej1) {
+
+            return;
+
+        }
+    }
 
 
 
-	QStringList new_codes = (QStringList() << ui.lineNew1->text()
-			<< ui.lineNew2->text() << ui.lineNew3->text()
-			<< ui.lineNew4->text() << ui.lineNew5->text());
+
+    QStringList new_codes = (QStringList() << ui.lineNew1->text());
+
+    if (ui.lineNew2->text()!="")
+        new_codes<<ui.lineNew2->text();
+    if (ui.lineNew3->text()!="")
+        new_codes<<ui.lineNew3->text();
+    if (ui.lineNew4->text()!="")
+        new_codes<<ui.lineNew4->text();
+    if (ui.lineNew5->text()!="")
+        new_codes<<ui.lineNew5->text();
+
+
 	QString old_code = ui.lineOld->text();
 
-    QStringList new_acodes = (QStringList() << ui.lineANew1->text()
-            << ui.lineANew2->text() << ui.lineANew3->text()
-            << ui.lineANew4->text() << ui.lineANew5->text());
+    QStringList new_acodes = (QStringList() << ui.lineANew1->text());
+    if (ui.lineANew2->text()!="")
+        new_codes<<ui.lineANew2->text();
+    if (ui.lineANew3->text()!="")
+        new_codes<<ui.lineANew3->text();
+    if (ui.lineANew4->text()!="")
+        new_codes<<ui.lineANew4->text();
+    if (ui.lineANew5->text()!="")
+        new_codes<<ui.lineANew5->text();
+
     QString old_acode = ui.lineAold->text();
 
     insert_production(old_code, new_codes,old_acode,new_acodes);
@@ -396,30 +450,47 @@ void rewrap::cancelClicked() {
 	delete (this);
 }
 
-void rewrap::insert_production(QString old_code, QStringList new_codes,QString old_acode,QStringList new_acodes) {
+void rewrap::insert_production(const QString &old_code, const QStringList &new_codes, const QString &old_acode, const QStringList &new_acodes) {
 	QSqlQuery query(*db1);
-    query.exec(	"select top 1 pr_date from production where code_t='"+ old_code + "'");
+    query.exec(	"select top 1 pr_date from z_production where code_t='"+ old_code + "'");
 	query.next();
 
     QString pr_date = query.value(0).toString();
 
+    qDebug()<<"NEW_CODES:"<<new_codes.size();
 
 
 
     for (int q = 0; q < new_codes.size(); ++q) {
 		QString code_t = new_codes.value(q);
         QString code_a = new_acodes.value(q);
-        query.prepare("INSERT INTO rewrap (oldcode_a,oldcode_t,newcode_a,newcode_t,rewrap_date,pr_date_oldcode) VALUES (?,?,?,?,?,?)");
+        QString qstr="INSERT INTO z_rewrap (oldcode_a,oldcode_t,newcode_a,newcode_t,rewrap_date,pr_date_oldcode) VALUES (?,?,?,?,?,?)";
+        bool success=query.prepare(qstr);
         query.addBindValue(old_acode);
         query.addBindValue(old_code);
         query.addBindValue(code_a);
         query.addBindValue(code_t);
-        query.addBindValue(old_acode);
         query.addBindValue(QDateTime::currentDateTime().toString(Qt::ISODate)) ;
         query.addBindValue(pr_date);
-        query.exec();
+
+
+        bool success1=query.exec();
+        qDebug()<<"SUCCESS"<<success;
+        qDebug()<<"SUCCESS1"<<success1;
+        Elina_Labels::log(query.executedQuery());
 
 		}
 
-	}
+}
+
+void rewrap::checkDummy(const QString &code)
+{
+    QSqlQuery query(*db1);
+    query.exec(	"select top 1 * from z_production where is_dummy=1 and code_t='"+ code + "'");
+    if (!query.next())
+        isDummy=false;
+
+
+}
+
 

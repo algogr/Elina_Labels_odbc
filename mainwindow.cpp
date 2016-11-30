@@ -26,32 +26,72 @@ mainWindow::mainWindow(QWidget *parent,int mode)
     QString settingsFile = (QDir::currentPath()+ "/settings.ini");
     QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
 
-    QString dbhost=settings->value("dbhost").toString();
-    QString dbuser=settings->value("dbuser").toString();
-    QString dbpassword=settings->value("dbpassword").toString();
+    QString dbhosterp=settings->value("dbhosterp").toString();
+    QString dbusererp=settings->value("dbusererp").toString();
+    QString dbpassworderp=settings->value("dbpassworderp").toString();
+
+    QString dbhostext=settings->value("dbhostext").toString();
+    QString dbuserext=settings->value("dbuserext").toString();
+    QString dbpasswordext=settings->value("dbpasswordext").toString();
+
+    QString dbhostpro=settings->value("dbhostpro").toString();
+    QString dbuserpro=settings->value("dbuserpro").toString();
+    QString dbpasswordpro=settings->value("dbpasswordpro").toString();
+
+
     QString dberp=settings->value("dberp").toString();
     QString dbext=settings->value("dbext").toString();
+    QString dbpro=settings->value("dbpro").toString();
 
-    //db=Προδιαγραφες   ----                db1=ERP
-	db = QSqlDatabase::addDatabase("QTDS");
-    db.setDatabaseName("elinaProdiagrafes");
-    db.setUserName("sa");
-    db.setPassword("sa");
-    db.setHostName("192.168.0.250");
+    delete settings;
 
-    db1 = QSqlDatabase::addDatabase("QTDS","erp");
+    //db=Production---db1=Προδιαγραφες   ----                db2=ERP
+    //db = QSqlDatabase::addDatabase("QTDS");
+    db = QSqlDatabase::addDatabase("QODBC","ext");
+
+    db.setDatabaseName(dbext);
+
+    db.setUserName(dbuserext);
+    db.setPassword(dbpasswordext);
+    db.setHostName(dbhostext);
+
+
+
+    db1 = QSqlDatabase::addDatabase("QODBC","pro");
+    db1.setDatabaseName(dbpro);
+    db1.setUserName(dbuserpro);
+    db1.setPassword(dbpasswordpro);
+    db1.setHostName(dbhostpro);
+
+    db2 = QSqlDatabase::addDatabase("QODBC","erp");
     //db1 = QSqlDatabase::addDatabase("QTDS");
-    db1.setDatabaseName(dberp);
-    db1.setUserName(dbuser);
-    db1.setPassword(dbpassword);
-    db1.setHostName(dbhost);
+    db2.setDatabaseName(dberp);
+    db2.setUserName(dbusererp);
+    db2.setPassword(dbpassworderp);
+    db2.setHostName(dbhosterp);
+
+
+    db=QSqlDatabase::database("ext");
 
     if (db.open() == false) {
-            QMessageBox::critical(0, "Error", "Error");
+            QMessageBox::critical(0, "Error on Prodiagrafes", db.lastError().text());
             exit(0);
         }
+    bool test=db.isOpen();
+
+    qDebug()<<test;
     //db.open();
-    db1.open();
+    if (db1.open()==false)
+    {
+        QMessageBox::critical(0, "Error on Production", db1.lastError().text());
+        exit(0);
+    }
+
+    if (db2.open()==false)
+    {
+        QMessageBox::critical(0, "Error on ERP", db2.lastError().text());
+        //exit(0);
+    }
 
     //db = QSqlDatabase::database();
     //db1 = QSqlDatabase::database("erp");
@@ -61,18 +101,25 @@ mainWindow::mainWindow(QWidget *parent,int mode)
                     ("SELECT * FROM telika_proionta");
 
 
-    QSqlQuery qp;
+    QSqlQuery qp(db);
     bool success1= qp.prepare(query);
     qDebug()<<"SU1:"<<success1;
-     bool success=qp.exec(query);
+    test=db.isOpen();
+    qDebug()<<test;
+    test=db.isOpenError();
+    qDebug()<<test;
+     bool success=qp.exec();
      qDebug()<<qp.lastError().text();
     qDebug()<<db.lastError().text();
-    qDebug()<<db1.lastError().text();
+    //qDebug()<<db1.lastError().text();
     qDebug()<<"SU:"<<success;
+
     qDebug()<<query;
-    qDebug()<<qp.lastError().text();
     qp.next();
-    qDebug()<<qp.value(0).toString();
+    qDebug()<<"Fisrst"<<qp.value(0).toString();
+    qDebug()<<qp.lastError().text();
+   qDebug()<<db.lastError().text();
+
 	ui.setupUi(this);
     connect(ui.action, SIGNAL(triggered()), this, SLOT(labels()));
 
@@ -87,8 +134,8 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 		{
 
 
-			ui.action3A->setVisible(FALSE);
-			ui.actionK_T->setVisible(FALSE);
+            ui.action3A->setVisible(false);
+            ui.actionK_T->setVisible(false);
 
             labels();
 		}
@@ -103,6 +150,7 @@ mainWindow::~mainWindow()
 
 	db.close();
 	db1.close();
+    db2.close();
 
 
 }
@@ -113,6 +161,7 @@ void mainWindow::labels()
 
 	w->show();
 	w->move(0,0);
+    w->setFocus();
 }
 
 void mainWindow::logout()

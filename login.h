@@ -19,9 +19,9 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtGui>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 #include <QApplication>
 #include "ui_login.h"
 #include "mainwindow.h"

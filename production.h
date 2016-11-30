@@ -19,8 +19,8 @@
 #ifndef PRODUCTION_H
 #define PRODUCTION_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QDialog>
+#include <QWidget>
+#include <QDialog>
 #include <QtSql>
 #include "ui_production.h"
 

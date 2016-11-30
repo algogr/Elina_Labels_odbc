@@ -21,7 +21,8 @@
 
 #include <QtGui>
 #include <QApplication>
-
+#include <QSplashScreen>
+#include <QDesktopWidget>
 
 
 
@@ -45,13 +46,23 @@ int main(int argc, char *argv[])
     if(!st.open(QIODevice::ReadOnly | QIODevice::Text))
 
         {
-            settings->setValue("dbhost","192.168.0.250");
-            settings->setValue("dbuser","sa");
-            settings->setValue("dbpassword","sa");
-            settings->setValue("dberp","elinaProdiagrafes");
-            settings->setValue("dbext","elinaProdiagrafes");
+            settings->setValue("dbhosterp","194.111.212.230");
+            settings->setValue("dbhostext","194.111.212.249"); //prodiagrafes
+            settings->setValue("dbhostpro","194.111.212.230"); //production
+            settings->setValue("dbusererp","sa");
+            settings->setValue("dbpassworderp","STM2support");
+            settings->setValue("dbuserext","sa");
+            settings->setValue("dbpasswordext","sa");
+            settings->setValue("dbuserpro","sa");
+            settings->setValue("dbpasswordpro","STM2support");
+
+
+            settings->setValue("dberp","erp");
+            settings->setValue("dbext","ext");
+            settings->setValue("dbpro","pro");
             settings->setValue("apath","/home/elina/Elina_Labels/");
             settings->setValue("version",VERSION);
+            settings->setValue("log","sql.log");
             settings->sync();
 
         }

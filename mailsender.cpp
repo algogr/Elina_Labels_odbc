@@ -11,6 +11,7 @@
 #include <QHostInfo>
 #include <time.h>
 #include <QCryptographicHash>
+#include <QDataStream>
 
 
 static int dateswap(QString form, uint unixtime )

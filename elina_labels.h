@@ -19,9 +19,9 @@
 #ifndef ELINA_LABELS_H
 #define ELINA_LABELS_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QDialog>
-#include <QtGui/QMessageBox>
+#include <QWidget>
+#include <QDialog>
+#include <QMessageBox>
 #include <QtNetwork>
 #include <QtSql>
 #include <QPrintDialog>
@@ -42,10 +42,11 @@ class Elina_Labels : public QDialog
     Q_OBJECT
 
 public:
-    Elina_Labels(QWidget *parent = 0,QSqlDatabase *db=0 ,QSqlDatabase *db1=0);
+    Elina_Labels(QWidget *parent = 0,QSqlDatabase *db=0 ,QSqlDatabase *db1=0, QSqlDatabase *db2=0);
     ~Elina_Labels();
     static bool checkCodeA(const QString &code);
     static bool checkCodeT(const QString &code);
+    static void log(const QString &query);
 
 
 private slots:
@@ -76,8 +77,8 @@ private slots:
 
 private:
     Ui::Elina_LabelsClass ui;
-    QSqlDatabase *db;
-    QSqlDatabase *db1;
+    QSqlDatabase *db,*db1,*db2;
+
 
     QSqlQueryModel *model;
     QTextCodec *codec;
@@ -90,7 +91,7 @@ private:
 
 
     void setupModel_Code(const QString &like);
-    void check_kef_code(QString f_code);
+    bool check_kef_code(QString f_code);
     QString insert_db_prod(const QString &code_t,const QString &f_code);
     void print_label(QString code_t,QString f_code);
     bool final_check(QString f_code);
@@ -100,6 +101,7 @@ private:
     void enable_entry_controls();
     bool checkDoubleCodeT(const QString &codeT);
     void setDeleted (const QString &codeT);
+
     QString createAa(const QString &middle,const QString &fCode);
 
     QString get_code_t(QString f_code);

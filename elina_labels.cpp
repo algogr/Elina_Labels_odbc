@@ -26,8 +26,8 @@
 using namespace std;
 
 Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
-        QSqlDatabase *db1) :
-    QDialog(parent), db(db),db1(db1) {
+        QSqlDatabase *db1,QSqlDatabase *db2) :
+    QDialog(parent), db(db),db1(db1),db2(db2) {
 	codec = QTextCodec::codecForName("Windows1253");
 	decoder = codec->makeDecoder();
     model= new QSqlQueryModel;
@@ -38,32 +38,32 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 
     ui.setupUi(this);
 
-	ui.quitButton->setVisible(FALSE);
-	ui.scanlineEdit->setEnabled(FALSE);
+    ui.quitButton->setVisible(false);
+    ui.scanlineEdit->setEnabled(false);
 
 
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 
-	ui.insertButton->setEnabled(FALSE);
-	ui.removeButton->setEnabled(FALSE);
+    ui.insertButton->setEnabled(false);
+    ui.removeButton->setEnabled(false);
 
-	ui.machinespinBox_2->setVisible(FALSE);
-	ui.machinespinBox_3->setVisible(FALSE);
+    ui.machinespinBox_2->setVisible(false);
+    ui.machinespinBox_3->setVisible(false);
 
-	ui.aaSpinBox_2->setVisible(FALSE);
-	ui.aaSpinBox_3->setVisible(FALSE);
-	ui.middleDateEdit_2->setVisible(FALSE);
-	ui.middleDateEdit_3->setVisible(FALSE);
+    ui.aaSpinBox_2->setVisible(false);
+    ui.aaSpinBox_3->setVisible(false);
+    ui.middleDateEdit_2->setVisible(false);
+    ui.middleDateEdit_3->setVisible(false);
 
 
-    ui.dummyProdDate->setEnabled(FALSE);
-    ui.dummyVardiaCombo->setEnabled(FALSE);
-    ui.dummyProdDate->setVisible(FALSE);
-    ui.dummyVardiaCombo->setVisible(FALSE);
-    ui.label_8->setVisible(FALSE);
-    ui.label_9->setVisible(FALSE);
+    ui.dummyProdDate->setEnabled(false);
+    ui.dummyVardiaCombo->setEnabled(false);
+    ui.dummyProdDate->setVisible(false);
+    ui.dummyVardiaCombo->setVisible(false);
+    ui.label_8->setVisible(false);
+    ui.label_9->setVisible(false);
 
-	ui.quitButton->setEnabled(FALSE);
+    ui.quitButton->setEnabled(false);
 	disable_entry_controls();
 
 	ui.tableView->setModel(model);
@@ -82,7 +82,7 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 
 	ui.productiontableWidget->setHorizontalHeaderLabels(QStringList()
 			<< trUtf8("Ημερ./Ωρα") << trUtf8("Κωδικός Προιόντος") << trUtf8(
-			"Κιλά") << trUtf8("Κωδ./Τ") << trUtf8("ΚEΦ") << trUtf8("Π/Χ")
+            "Κιλά") << trUtf8("Κωδ./Τ") << trUtf8("ERP") << trUtf8("Π/Χ")
 			<< trUtf8("Β"));
 	ui.productiontableWidget->setColumnWidth(0, 170);
 	ui.productiontableWidget->setColumnWidth(1, 170);
@@ -162,11 +162,10 @@ Elina_Labels::~Elina_Labels() {
 }
 
 void Elina_Labels::setupModel_Code(const QString &like) {
-	QString
-			query =
-					("SELECT kodikos_p,perigrafi FROM telika_proionta where kodikos_p like \'%");
+    QString query ="SELECT kodikos_p,perigrafi FROM telika_proionta where kodikos_p like \'%";
 
-	query.append(like);
+
+    query.append(like);
 	query.append("%\' ");
 	if (ex_codes.size() > 0) {
 		for (int i = 0; i < ex_codes.size(); ++i) {
@@ -174,12 +173,10 @@ void Elina_Labels::setupModel_Code(const QString &like) {
 		}
 	}
 	query.append(" order by kodikos_p");
-
-    QSqlQuery qp(*db1);
+    QSqlQuery qp(*db);
     qp.exec(query);
-    qDebug()<<query;
     qp.next();
-    qDebug()<<qp.value(0).toString();
+
     model->setQuery(qp);
     model->setHeaderData(0, Qt::Horizontal, trUtf8("Κωδικός"));
     model->setHeaderData(1, Qt::Horizontal, trUtf8("Περιγραφή"));
@@ -188,7 +185,11 @@ void Elina_Labels::setupModel_Code(const QString &like) {
 
 }
 
-void Elina_Labels::onTypeChar() {
+void Elina_Labels::onTypeChar() {QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+                                 QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+
+                                 QString dbhost=settings->value("dbhost").toString();
+                                 QString dbuser=settings->value("dbuser").toString();
 	QString app = ui.lineEdit->text();
 	QStringList list1 = app.split("-");
 	QString like = list1.join("");
@@ -219,7 +220,7 @@ void Elina_Labels::onTypeChar() {
 		str = str.insert(14, "-");
 		ui.lineEdit->setText(str);
 	}
-    ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 
 }
 
@@ -230,15 +231,15 @@ void Elina_Labels::rowClicked(const QModelIndex &index) {
 	QString query ="select p.kodikos as kodikos from prodiagrafes p,telika_proionta t where t.prodiagrafi=p.pid and t.kodikos_p='";
 	query.append(code);
 	query.append("'");
-    QSqlQuery qp;
+    QSqlQuery qp(*db);
 	qp.exec(query);
 	qp.next();
 	QString prod = qp.value(0).toString();
 	ui.prodLabel->setText(prod);
     if (ui.codeTableWidget->rowCount() < 15) {
-		ui.insertButton->setEnabled(TRUE);
+        ui.insertButton->setEnabled(true);
 	}
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 
 }
 
@@ -246,17 +247,18 @@ void Elina_Labels::next1Clicked() {
 
 	QTableWidgetItem *c = ui.codeTableWidget->item(row_sel, 0);
 	QString f_code = c->text();
-	if (final_check(f_code) == FALSE)
+    if (final_check(f_code) == false)
 		return;
 
 
 
 	QString code_t = get_code_t(f_code);
 
-    //TODO
-    bool dupCodeT=checkDoubleCodeT(code_t);
 
-    print_label(code_t, f_code);
+    if(checkDoubleCodeT(code_t))
+        return;
+
+    //print_label(code_t, f_code);
     //if (f_code.left(1)!="E")
     insert_db_prod(code_t,f_code);
     qDebug()<<"K?T:"<<code_t;
@@ -264,29 +266,24 @@ void Elina_Labels::next1Clicked() {
 
 	disable_entry_controls();
 	ui.dummycheckBox->setCheckState(Qt::Unchecked);
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 	ui.scanlineEdit->setFocus();
 
 }
 
-//TODO Check existence of code in erp
-void Elina_Labels::check_kef_code(QString f_code) {
-    /*
-	QByteArray block;
-	QDataStream out(&block, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_1);
-	QString req_type = "KFCHECK";
-	out << quint16(0) << req_type << f_code;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
-	client->write(block);
-	QByteArray block1;
-	QDataStream out1(&block, QIODevice::WriteOnly);
-	out1.setVersion(QDataStream::Qt_4_1);
-	out1 << quint16(0xFFFF);
-	client->write(block1);
-	ui.pushDelPro->setEnabled(FALSE);
-*/
+
+bool Elina_Labels::check_kef_code(QString f_code) {
+    QSqlQuery qp(*db2);
+    QString query="SELECT * from ESFIItem where code='"+f_code+"'";
+    qp.exec(query);
+    if(qp.next())
+        return true;
+    else
+        return false;;
+
+
+
+
 }
 
 QString Elina_Labels::insert_db_prod(const QString &code_t,const QString &f_code) {
@@ -338,7 +335,7 @@ QString Elina_Labels::insert_db_prod(const QString &code_t,const QString &f_code
 
 		QString
 				insert =
-                        "INSERT INTO PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isErp,code_t,middle_2,middle_3,"\
+                        "INSERT INTO z_PRODUCTION(weight,quality,middle,aa,pr_date,f_code,isErp,code_t,middle_2,middle_3,"\
                 "vardia,is_dummy,is_deleted) VALUES ("
 								+ weight + ",'" + qual + "','" + middle + "',"
 								+ ui.aaSpinBox->text() + ",'"
@@ -348,10 +345,12 @@ QString Elina_Labels::insert_db_prod(const QString &code_t,const QString &f_code
                                 + "','" + vardia + "',"+ isDummy+",0)";
 
 		query.exec(insert);
-        qDebug()<<insert;
+
+        log(insert);
+
 		refresh_production();
 
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 	return code_t;
 
 }
@@ -365,54 +364,54 @@ bool Elina_Labels::final_check(QString f_code) {
 	if (ui.machinespinBox->text() == "0") {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν Μηχανή 1ου ενδιμέσου"));
-		return FALSE;
+        return false;
 	}
 	if (ui.aaSpinBox->text() == "00") {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν δόθηκε Α/Α"));
-		return FALSE;
+        return false;
 	}
 
-	if (ui.aaSpinBox_2->text() == "00" && ui.aaSpinBox_2->isVisible() == TRUE) {
+    if (ui.aaSpinBox_2->text() == "00" && ui.aaSpinBox_2->isVisible() == true) {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν δόθηκε Α/Α 2oυ ενδιαμέσου"));
-		return FALSE;
+        return false;
 	}
 
-	if (ui.aaSpinBox_3->text() == "00" && ui.aaSpinBox_3->isVisible() == TRUE) {
+    if (ui.aaSpinBox_3->text() == "00" && ui.aaSpinBox_3->isVisible() == true) {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν δόθηκε Α/Α 2oυ ενδιαμέσου"));
-		return FALSE;
+        return false;
 	}
 
 	if (f_code == "") {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν επιλέχθηκε κωδικός"));
-		return FALSE;
+        return false;
 	}
 
 
 	if (ui.qualCombo->currentIndex() == -1) {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
                 "Δεν δόθηκε ποιοτικός χαρακτηρισμός"));
-		return FALSE;
+        return false;
 	}
 
 	if (ui.weightLineEdit->text() == "") {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν δόθηκε ζύγιση"));
-		return FALSE;
+        return false;
 	}
 	if (ui.weightLineEdit->text().toInt() < 10) {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Λάθος ζύγιση"));
-		return FALSE;
+        return false;
 	}
 
 	if (ui.machinespinBox->text() == "0") {
 		QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 				"Δεν δόθηκε μηχανή"));
-		return FALSE;
+        return false;
 	}
 
 	if (f_code.mid(10, 1).toInt() >= 2) {
@@ -420,12 +419,12 @@ bool Elina_Labels::final_check(QString f_code) {
 		if (ui.aaSpinBox_2->text() == "00") {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δεν δόθηκε Α/Α"));
-			return FALSE;
+            return false;
 		}
 		if (ui.machinespinBox_2->text() == "0") {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δεν δόθηκε μηχανή 2ου ενδιαμέσου"));
-			return FALSE;
+            return false;
 		}
 
 
@@ -435,13 +434,13 @@ bool Elina_Labels::final_check(QString f_code) {
 		if (ui.machinespinBox_3->text() == "0") {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δεν δόθηκε μηχανή 3ου ενδιαμέσου"));
-			return FALSE;
+            return false;
 		}
 
 		if (ui.aaSpinBox_3->text() == "00") {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δεν δόθηκε Α/Α"));
-			return FALSE;
+            return false;
 		}
 
 
@@ -452,13 +451,13 @@ bool Elina_Labels::final_check(QString f_code) {
 				&& ui.middleDateEdit_2->text() == ui.middleDateEdit_3->text()) {
 			QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
 					"Δόθηκε ίδιος κωδικός ενδιαμέσου"));
-			return FALSE;
+            return false;
 		}
 
 	}
 	enable_entry_controls();
-	ui.pushDelPro->setEnabled(FALSE);
-	return TRUE;
+    ui.pushDelPro->setEnabled(false);
+    return true;
 
 }
 
@@ -494,7 +493,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 	QSqlQuery query(*db);
 	QString a = "SELECT perigrafi2,kopi FROM telika_proionta where kodikos_p='"
 			+ f_code + "'";
-	query.exec(a);
+    query.exec(a);
 	query.last();
 	QString quality = query.value(0).toString();
 	QString width = query.value(1).toString();
@@ -597,7 +596,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 	}
 	fh.close();
 
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
     delete settings;
 }
 
@@ -607,7 +606,8 @@ void Elina_Labels::insertClicked() {
 	QString query =
 			"select kodikos_p,perigrafi from telika_proionta where kodikos_p='"
 					+ kodikos_p + "'";
-	QSqlQuery qp;
+
+    QSqlQuery qp(*db);
 	qp.exec(query);
 	qp.next();
 	int r = ui.codeTableWidget->rowCount();
@@ -622,11 +622,15 @@ void Elina_Labels::insertClicked() {
 	k->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	ui.codeTableWidget->setItem(r, 1, k);
 	ex_codes << (qp.value(0).toString());
+    if (!check_kef_code(qp.value(0).toString()))
+        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                "O κωδικός της προδιαγραφής δεν υπάρχει στο ERP"));
+
 	ui.lineEdit->setText("");
-	ui.insertButton->setEnabled(FALSE);
+    ui.insertButton->setEnabled(false);
 	disable_entry_controls();
 	ui.lineEdit->setFocus();
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 
 }
 
@@ -640,11 +644,11 @@ void Elina_Labels::removeClicked() {
 		ui.prodLabel->setText("");
 		this->setupModel_Code(like);
 		ui.tableView->setModel(model);
-		ui.removeButton->setEnabled(FALSE);
+        ui.removeButton->setEnabled(false);
 		disable_entry_controls();
 		ui.lineEdit->setFocus();
 	}
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 void Elina_Labels::upClicked() {
@@ -686,7 +690,7 @@ void Elina_Labels::upClicked() {
 
 	}
 	qDebug() << row_sel;
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 
 }
 
@@ -728,14 +732,14 @@ void Elina_Labels::downClicked() {
 	}
 
 	qDebug() << row_sel;
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 void Elina_Labels::rowClickedSel(const QModelIndex &index) {
 	enable_entry_controls();
 	reset_values();
 	row_sel = index.row();
-	ui.removeButton->setEnabled(TRUE);
+    ui.removeButton->setEnabled(true);
 	QTableWidgetItem *c = ui.codeTableWidget->item(row_sel, 0);
 	QString code = c->text();
 	qDebug() << code;
@@ -746,33 +750,33 @@ void Elina_Labels::rowClickedSel(const QModelIndex &index) {
 	}
 
 	if (code.mid(10, 1).toInt() == 1) {
-		ui.machinespinBox_2->setVisible(FALSE);
-		ui.machinespinBox_3->setVisible(FALSE);
-		ui.aaSpinBox_2->setVisible(FALSE);
-		ui.aaSpinBox_3->setVisible(FALSE);
-		ui.middleDateEdit_2->setVisible(FALSE);
-		ui.middleDateEdit_3->setVisible(FALSE);
+        ui.machinespinBox_2->setVisible(false);
+        ui.machinespinBox_3->setVisible(false);
+        ui.aaSpinBox_2->setVisible(false);
+        ui.aaSpinBox_3->setVisible(false);
+        ui.middleDateEdit_2->setVisible(false);
+        ui.middleDateEdit_3->setVisible(false);
 	}
 
 	if (code.mid(10, 1).toInt() == 2) {
-		ui.machinespinBox_2->setVisible(TRUE);
-		ui.aaSpinBox_2->setVisible(TRUE);
-		ui.middleDateEdit_2->setVisible(TRUE);
-		ui.machinespinBox_3->setVisible(FALSE);
-		ui.aaSpinBox_3->setVisible(FALSE);
-		ui.middleDateEdit_3->setVisible(FALSE);
+        ui.machinespinBox_2->setVisible(true);
+        ui.aaSpinBox_2->setVisible(true);
+        ui.middleDateEdit_2->setVisible(true);
+        ui.machinespinBox_3->setVisible(false);
+        ui.aaSpinBox_3->setVisible(false);
+        ui.middleDateEdit_3->setVisible(false);
 
 	}
 
 	if (code.mid(10, 1).toInt() == 3) {
-		ui.machinespinBox_2->setVisible(TRUE);
-		ui.machinespinBox_3->setVisible(TRUE);
-		ui.aaSpinBox_2->setVisible(TRUE);
-		ui.aaSpinBox_3->setVisible(TRUE);
-		ui.middleDateEdit_2->setVisible(TRUE);
-		ui.middleDateEdit_3->setVisible(TRUE);
+        ui.machinespinBox_2->setVisible(true);
+        ui.machinespinBox_3->setVisible(true);
+        ui.aaSpinBox_2->setVisible(true);
+        ui.aaSpinBox_3->setVisible(true);
+        ui.middleDateEdit_2->setVisible(true);
+        ui.middleDateEdit_3->setVisible(true);
 	}
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 void Elina_Labels::reset_values() {
@@ -798,7 +802,7 @@ void Elina_Labels::reset_values() {
     ui.dummyProdDate->setDate(default_date);
 	ui.qualCombo->setCurrentIndex(-1);
 	ui.weightLineEdit->setText("");
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 void Elina_Labels::refresh_production() {
@@ -807,12 +811,12 @@ void Elina_Labels::refresh_production() {
 
 	QString
 			a =
-                    "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
+                    "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from z_production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
 	query.exec(a);
 	int r = 0;
     qDebug()<<"Q:"<<query.size();
 
-	while (query.next() != FALSE) {
+    while (query.next() != false) {
 		ui.productiontableWidget->setRowCount(r + 1);
 		QTableWidgetItem *j = new QTableWidgetItem;
 
@@ -867,7 +871,7 @@ void Elina_Labels::refresh_production() {
 			QWidget *t = ui.productiontableWidget->cellWidget(r, 4);
 			QCheckBox* u;
 			u = (QCheckBox*) t;
-			u->setEnabled(FALSE);
+            u->setEnabled(false);
 			u->setCheckState(Qt::Checked);
 		}
 
@@ -900,7 +904,7 @@ void Elina_Labels::refresh_production() {
 
 		r++;
 	}
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 
@@ -909,67 +913,67 @@ void Elina_Labels::Scanned() {
 	code_t = ui.scanlineEdit->text();
     setDeleted(code_t);
 	ui.scanlineEdit->setText("");
-	ui.scanlineEdit->setEnabled(FALSE);
-	ui.checkBox->setChecked(FALSE);
+    ui.scanlineEdit->setEnabled(false);
+    ui.checkBox->setChecked(false);
 
 	refresh_production();
 
 }
 
 void Elina_Labels::disable_entry_controls() {
-	ui.machinespinBox->setEnabled(FALSE);
-	ui.aaSpinBox->setEnabled(FALSE);
-	ui.middleDateEdit->setEnabled(FALSE);
-	ui.qualCombo->setEnabled(FALSE);
-	ui.weightLineEdit->setEnabled(FALSE);
-	ui.nextButton->setEnabled(FALSE);
-	ui.machinespinBox_2->setVisible(FALSE);
-	ui.aaSpinBox_2->setVisible(FALSE);
-	ui.middleDateEdit_2->setVisible(FALSE);
-	ui.machinespinBox_2->setVisible(FALSE);
-	ui.aaSpinBox_2->setVisible(FALSE);
-	ui.middleDateEdit_2->setVisible(FALSE);
-	ui.pushDelPro->setEnabled(FALSE);
-    ui.dummyProdDate->setEnabled(FALSE);
-    ui.dummyProdDate->setVisible(FALSE);
-    ui.dummyVardiaCombo->setEnabled(FALSE);
-    ui.dummyVardiaCombo->setVisible(FALSE);
+    ui.machinespinBox->setEnabled(false);
+    ui.aaSpinBox->setEnabled(false);
+    ui.middleDateEdit->setEnabled(false);
+    ui.qualCombo->setEnabled(false);
+    ui.weightLineEdit->setEnabled(false);
+    ui.nextButton->setEnabled(false);
+    ui.machinespinBox_2->setVisible(false);
+    ui.aaSpinBox_2->setVisible(false);
+    ui.middleDateEdit_2->setVisible(false);
+    ui.machinespinBox_2->setVisible(false);
+    ui.aaSpinBox_2->setVisible(false);
+    ui.middleDateEdit_2->setVisible(false);
+    ui.pushDelPro->setEnabled(false);
+    ui.dummyProdDate->setEnabled(false);
+    ui.dummyProdDate->setVisible(false);
+    ui.dummyVardiaCombo->setEnabled(false);
+    ui.dummyVardiaCombo->setVisible(false);
 
 }
 
 void Elina_Labels::enable_entry_controls() {
-	ui.machinespinBox->setEnabled(TRUE);
-	ui.aaSpinBox->setEnabled(TRUE);
-	ui.middleDateEdit->setEnabled(TRUE);
-	ui.qualCombo->setEnabled(TRUE);
-	ui.weightLineEdit->setEnabled(TRUE);
-	ui.nextButton->setEnabled(TRUE);
+    ui.machinespinBox->setEnabled(true);
+    ui.aaSpinBox->setEnabled(true);
+    ui.middleDateEdit->setEnabled(true);
+    ui.qualCombo->setEnabled(true);
+    ui.weightLineEdit->setEnabled(true);
+    ui.nextButton->setEnabled(true);
 }
 
 void Elina_Labels::setSpinBoxFormat() {
     (ui.aaSpinBox->value() < 10) ? ui.aaSpinBox->setPrefix("0"):ui.aaSpinBox->setPrefix("");
     (ui.aaSpinBox_2->value() < 10) ? ui.aaSpinBox_2->setPrefix("0"):ui.aaSpinBox_2->setPrefix("");
     (ui.aaSpinBox_3->value() < 10) ? ui.aaSpinBox_3->setPrefix("0"):ui.aaSpinBox_3->setPrefix("");
-     ui.pushDelPro->setEnabled(FALSE);
+     ui.pushDelPro->setEnabled(false);
 
 }
 
 void Elina_Labels::clearLineEdit() {
 	ui.lineEdit->setText("");
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 }
 
 void Elina_Labels::copy_machine() {
-	if (ui.machinespinBox_2->isEnabled() == TRUE)
+    if (ui.machinespinBox_2->isEnabled() == true)
 		ui.machinespinBox_2->setValue(ui.machinespinBox->value());
-	if (ui.machinespinBox_3->isEnabled() == TRUE)
+    if (ui.machinespinBox_3->isEnabled() == true)
 		ui.machinespinBox_3->setValue(ui.machinespinBox->value());
 }
 
 void Elina_Labels::copy_middledate() {
-	if (ui.middleDateEdit_2->isEnabled() == TRUE)
+    if (ui.middleDateEdit_2->isEnabled() == true)
 		ui.middleDateEdit_2->setDate(ui.middleDateEdit->date());
-	if (ui.middleDateEdit_3->isEnabled() == TRUE)
+    if (ui.middleDateEdit_3->isEnabled() == true)
 		ui.middleDateEdit_3->setDate(ui.middleDateEdit->date());
 }
 
@@ -1060,13 +1064,13 @@ QString Elina_Labels::get_middle3() {
 
 
 void Elina_Labels::checkClicked() {
-	ui.pushDelPro->setEnabled(FALSE);
-    (ui.checkBox->checkState() == 2) ? ui.scanlineEdit->setEnabled(TRUE) : ui.scanlineEdit->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
+    (ui.checkBox->checkState() == 2) ? ui.scanlineEdit->setEnabled(true) : ui.scanlineEdit->setEnabled(false);
 
 }
 
 void Elina_Labels::rewrapClicked() {
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
     rewrap *w = new rewrap(this, db1);
 	w->move(200, 200);
 	w->show();
@@ -1074,12 +1078,12 @@ void Elina_Labels::rewrapClicked() {
 }
 
 void Elina_Labels::weight_check() {
-	ui.pushDelPro->setEnabled(FALSE);
+    ui.pushDelPro->setEnabled(false);
 	QString weight = ui.weightLineEdit->text();
 	bool ok;
 	int wint = weight.toInt(&ok, 10);
 
-	if (ok == FALSE) {
+    if (ok == false) {
 		weight = "";
 		goto tt;
 	}
@@ -1154,7 +1158,7 @@ void Elina_Labels::rowClickedSelProd(const QModelIndex &index) {
 
 	}
 
-	ui.pushDelPro->setEnabled(TRUE);
+    ui.pushDelPro->setEnabled(true);
 
 }
 
@@ -1165,33 +1169,33 @@ void Elina_Labels::dummycheckpressed()
 {
     if (ui.dummycheckBox->checkState() == 2)
     {
-        ui.dummyProdDate->setEnabled(TRUE);
-        ui.dummyProdDate->setVisible(TRUE);
+        ui.dummyProdDate->setEnabled(true);
+        ui.dummyProdDate->setVisible(true);
         //ui.dummyProdDate->setDate(QDate::currentDate());
-        ui.dummyVardiaCombo->setEnabled(TRUE);
-        ui.dummyVardiaCombo->setVisible(TRUE);
-        ui.label_8->setVisible(TRUE);
-        ui.label_9->setVisible(TRUE);
+        ui.dummyVardiaCombo->setEnabled(true);
+        ui.dummyVardiaCombo->setVisible(true);
+        ui.label_8->setVisible(true);
+        ui.label_9->setVisible(true);
     }
 
     else
     {
-        ui.dummyProdDate->setEnabled(FALSE);
-        ui.dummyProdDate->setVisible(FALSE);
-        ui.dummyVardiaCombo->setEnabled(FALSE);
-        ui.dummyVardiaCombo->setVisible(FALSE);
-        ui.label_8->setVisible(FALSE);
-        ui.label_9->setVisible(FALSE);
+        ui.dummyProdDate->setEnabled(false);
+        ui.dummyProdDate->setVisible(false);
+        ui.dummyVardiaCombo->setEnabled(false);
+        ui.dummyVardiaCombo->setVisible(false);
+        ui.label_8->setVisible(false);
+        ui.label_9->setVisible(false);
     }
 }
 
 bool Elina_Labels::checkDoubleCodeT(const QString &codeT)
 {
-    //TODO
-    QSqlQuery query(*db1);
-    QString q1,q2;
-    q1="select * from production where code_t='"+codeT+"'";
-    q2="select * from production_dummy where code_t='"+codeT+"'";
+
+    QSqlQuery query(*db1),query1(*db2);
+    QString q1,q2,q3;
+    q1="select * from z_production where code_t='"+codeT+"'";
+    q2="select * from z_production_dummy where code_t='"+codeT+"'";
     query.exec(q1);
     if (query.next())
     {
@@ -1208,13 +1212,53 @@ bool Elina_Labels::checkDoubleCodeT(const QString &codeT)
                 "Aυτός ο Κ/Τ έχει ήδη εκτυπωθεί σαν dummy. Η ετικέτα δεν θα εκτυπωθεί"));
         return true;
     }
+
+    q3="select * from ESMMLot";
+    query1.exec(q3);
+    if (query1.next())
+    {
+        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                "Aυτός ο Κ/Τ υπάρχει ήδη εκτυπωθεί στο ERP. Η ετικέτα δεν θα εκτυπωθεί"));
+        return true;
+    }
+
+
     return false;
 }
 
 void Elina_Labels::setDeleted(const QString &codeT)
 {
     QSqlQuery query(*db1);
-    query.exec("update production set is_deleted=1 where code_t='" + codeT + "'");
+    QString qstr="update z_production set is_deleted=1 where code_t='" + codeT + "'";
+    query.exec(qstr);
+    log(qstr);
+
+}
+
+void Elina_Labels::log(const QString &query)
+{
+    QString settingsFile = (QDir::currentPath()+ "/settings.ini");
+    QSettings *settings =new QSettings(settingsFile,QSettings::IniFormat);
+
+    QString logfile=settings->value("log").toString();
+    delete settings;
+
+    QFile file(logfile);
+
+    if (!file.exists()) {
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qDebug() << "Cannot open file for writing: "
+                    << qPrintable(file.errorString()) << endl;
+
+        }
+    } else
+        file.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&file);
+    out<<query;
+
+
+    file.close();
+
 
 }
 
@@ -1222,14 +1266,14 @@ QString Elina_Labels::createAa(const QString &middle, const QString &fCode)
 {
     QSqlQuery query(*db1);
     QString code = ui.lineEdit->text();
-    QString f_aa = "SELECT COUNT(*) from PRODUCTION where f_code='" + fCode
+    QString f_aa = "SELECT COUNT(*) from z_PRODUCTION where f_code='" + fCode
             + "' and middle='" + middle + "'";
     query.exec(f_aa);
     query.first();
     QString aa;
     QVariant a;
     a = query.value(0).toInt() ;
-    f_aa= "SELECT COUNT(*) from PRODUCTION_DUMMY where f_code='" + fCode
+    f_aa= "SELECT COUNT(*) from z_PRODUCTION_DUMMY where f_code='" + fCode
             + "' and middle='" + middle + "'";
     query.exec(f_aa);
     query.first();
@@ -1246,7 +1290,7 @@ bool Elina_Labels::checkCodeA(const QString &code)
 
     QRegExp ka("\[AE]\\d{14,14}");
 
-    if (ka.exactMatch(code) == FALSE) {
+    if (ka.exactMatch(code) == false) {
         QMessageBox m;
 
         m.setText(trUtf8("Λάθος μορφή  Κ/A"));
@@ -1265,7 +1309,7 @@ bool Elina_Labels::checkCodeA(const QString &code)
 bool Elina_Labels::checkCodeT(const QString &code)
 {
     QRegExp kt("\\d{12,12}[XYZ-]\\d{2,2}");
-    if (kt.exactMatch(code) == FALSE) {
+    if (kt.exactMatch(code) == false) {
         QMessageBox m;
 
         m.setText(trUtf8("Λάθος μορφή  Κ/Τ"));

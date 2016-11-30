@@ -19,7 +19,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QtSql>
 #include "ui_mainwindow.h"
 #include "elina_labels.h"
@@ -36,7 +36,7 @@ public:
     mainWindow(QWidget *parent = 0,int mode=0);
     ~mainWindow();
     QString currentData;
-    QSqlDatabase db,db1;
+    QSqlDatabase db,db1,db2;
 
 
 

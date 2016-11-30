@@ -54,7 +54,7 @@ void r3A::fetch_data()
 	QSqlQuery query(*db1);
 	query.exec(st);
 	int r=0;
-	while (query.next()!=FALSE){
+    while (query.next()!=false){
 			ui.tableWidget->setRowCount(r+1);
 			QTableWidgetItem *j=new QTableWidgetItem;
 			j->setText(query.value(0).toString());
@@ -115,7 +115,7 @@ void r3A::update()
 			query.exec(getmaxid);
 			query.last();
 			QVariant rec_id;
-			if (query.last()==FALSE)
+            if (query.last()==false)
 				{
 					rec_id=0;
 				}

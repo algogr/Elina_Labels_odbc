@@ -19,11 +19,12 @@
 #ifndef REWRAP_H
 #define REWRAP_H
 
-#include <QtGui/QDialog>
+//#include <QtGui/QDialog>
+#include <QDialog>
 #include "ui_rewrap.h"
 #include <QtNetwork>
 #include <QtSql>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 
 class rewrap : public QDialog
@@ -34,10 +35,14 @@ public:
     rewrap(QWidget *parent = 0,QSqlDatabase *db1=0);
     ~rewrap();
 
+
 private:
     Ui::rewrapClass ui;
     QSqlDatabase *db1;
-    void insert_production(QString old_code,QStringList new_codes,QString old_acode,QStringList new_acodes);
+    bool isDummy;
+    void insert_production(const QString &old_code,const QStringList &new_codes,const QString &old_acode,const QStringList &new_acodes);
+    void checkDummy(const QString &code);
+
 
 private slots:
 	void scanned_old();

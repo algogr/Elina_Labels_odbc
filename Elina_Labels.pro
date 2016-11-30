@@ -3,7 +3,9 @@ TARGET = Elina_Labels
 QT += core \
     gui \
     sql \
-    network
+    network \
+    widgets \
+    printsupport
 HEADERS += rewrap.h \
     mainwindow.h \
     ktreport.h \

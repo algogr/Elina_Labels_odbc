@@ -17,6 +17,7 @@
     */
 
 #include "login.h"
+#include <QDesktopWidget>
 
 login::login(QWidget *parent)
     : QDialog(parent)
