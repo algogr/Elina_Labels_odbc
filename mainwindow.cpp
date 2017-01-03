@@ -50,7 +50,6 @@ mainWindow::mainWindow(QWidget *parent,int mode)
     db = QSqlDatabase::addDatabase("QODBC","ext");
 
     db.setDatabaseName(dbext);
-
     db.setUserName(dbuserext);
     db.setPassword(dbpasswordext);
     db.setHostName(dbhostext);
@@ -64,7 +63,6 @@ mainWindow::mainWindow(QWidget *parent,int mode)
     db1.setHostName(dbhostpro);
 
     db2 = QSqlDatabase::addDatabase("QODBC","erp");
-    //db1 = QSqlDatabase::addDatabase("QTDS");
     db2.setDatabaseName(dberp);
     db2.setUserName(dbusererp);
     db2.setPassword(dbpassworderp);
@@ -77,10 +75,7 @@ mainWindow::mainWindow(QWidget *parent,int mode)
             QMessageBox::critical(0, "Error on Prodiagrafes", db.lastError().text());
             exit(0);
         }
-    bool test=db.isOpen();
 
-    qDebug()<<test;
-    //db.open();
     if (db1.open()==false)
     {
         QMessageBox::critical(0, "Error on Production", db1.lastError().text());
@@ -90,35 +85,10 @@ mainWindow::mainWindow(QWidget *parent,int mode)
     if (db2.open()==false)
     {
         QMessageBox::critical(0, "Error on ERP", db2.lastError().text());
-        //exit(0);
+        exit(0);
     }
 
-    //db = QSqlDatabase::database();
-    //db1 = QSqlDatabase::database("erp");
-    //TODO      TESTING DB
-    QString
-            query =
-                    ("SELECT * FROM telika_proionta");
-
-
-    QSqlQuery qp(db);
-    bool success1= qp.prepare(query);
-    qDebug()<<"SU1:"<<success1;
-    test=db.isOpen();
-    qDebug()<<test;
-    test=db.isOpenError();
-    qDebug()<<test;
-     bool success=qp.exec();
-     qDebug()<<qp.lastError().text();
-    qDebug()<<db.lastError().text();
-    //qDebug()<<db1.lastError().text();
-    qDebug()<<"SU:"<<success;
-
-    qDebug()<<query;
-    qp.next();
-    qDebug()<<"Fisrst"<<qp.value(0).toString();
-    qDebug()<<qp.lastError().text();
-   qDebug()<<db.lastError().text();
+    ;
 
 	ui.setupUi(this);
     connect(ui.action, SIGNAL(triggered()), this, SLOT(labels()));
@@ -139,10 +109,9 @@ mainWindow::mainWindow(QWidget *parent,int mode)
 
             labels();
 		}
-    qDebug()<<"db:"<<db.isOpen();
-    qDebug()<<"db1:"<<db1.isOpen();
 
-    //connect(ui.actionK_T, SIGNAL(triggered()), this, SLOT(rep_KT()));
+
+
 }
 
 mainWindow::~mainWindow()
@@ -157,11 +126,12 @@ mainWindow::~mainWindow()
 
 void mainWindow::labels()
 {
-    Elina_Labels *w= new Elina_Labels(this,&db,&db1);
+    Elina_Labels *w= new Elina_Labels(this,&db,&db1,&db2);
 
 	w->show();
 	w->move(0,0);
     w->setFocus();
+    this->setHidden(true);
 }
 
 void mainWindow::logout()

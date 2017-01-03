@@ -40,13 +40,19 @@ private:
     Ui::rewrapClass ui;
     QSqlDatabase *db1;
     bool isDummy;
-    void insert_production(const QString &old_code,const QStringList &new_codes,const QString &old_acode,const QStringList &new_acodes);
+    void insert_production(const QStringList &old_codes,const QStringList &new_codes,const QStringList &old_acodes,const QStringList &new_acodes);
     void checkDummy(const QString &code);
+    QString fetchPrDate(QString code_t);
+    QString getLastExecutedQuery(const QSqlQuery& query);
 
 
 private slots:
 	void scanned_old();
+    void scanned_old2();
+    void scanned_old3();
     void scanned_Aold();
+    void scanned_Aold2();
+    void scanned_Aold3();
 	void scanned_new1();
 	void scanned_new2();
 	void scanned_new3();

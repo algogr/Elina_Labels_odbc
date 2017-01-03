@@ -28,8 +28,8 @@ using namespace std;
 Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
         QSqlDatabase *db1,QSqlDatabase *db2) :
     QDialog(parent), db(db),db1(db1),db2(db2) {
-	codec = QTextCodec::codecForName("Windows1253");
-	decoder = codec->makeDecoder();
+    codec = QTextCodec::codecForName("Windows1253");
+    decoder = codec->makeDecoder();
     model= new QSqlQueryModel;
 
 
@@ -37,6 +37,13 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
     setupModel_Code("");
 
     ui.setupUi(this);
+
+    //ui.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.codeTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.codeTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui.productiontableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.productiontableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
 
     ui.quitButton->setVisible(false);
     ui.scanlineEdit->setEnabled(false);
@@ -151,6 +158,7 @@ Elina_Labels::Elina_Labels(QWidget *parent, QSqlDatabase *db,
 			this, SLOT(rowClickedSelProd(const QModelIndex &)));
 
     connect(ui.dummycheckBox,SIGNAL(clicked()),this,SLOT(dummycheckpressed()));
+    this->setFocus();
 
 
 
@@ -175,7 +183,9 @@ void Elina_Labels::setupModel_Code(const QString &like) {
 	query.append(" order by kodikos_p");
     QSqlQuery qp(*db);
     qp.exec(query);
+
     qp.next();
+    //qDebug()<<"JJJ"<<db->lastError().text();
 
     model->setQuery(qp);
     model->setHeaderData(0, Qt::Horizontal, trUtf8("Κωδικός"));
@@ -254,14 +264,14 @@ void Elina_Labels::next1Clicked() {
 
 	QString code_t = get_code_t(f_code);
 
-
+    //TODO Activate 3 lines below
     if(checkDoubleCodeT(code_t))
         return;
 
-    //print_label(code_t, f_code);
+    print_label(code_t, f_code);
     //if (f_code.left(1)!="E")
     insert_db_prod(code_t,f_code);
-    qDebug()<<"K?T:"<<code_t;
+    //qDebug()<<"K?T:"<<code_t;
 
 
 	disable_entry_controls();
@@ -277,7 +287,7 @@ bool Elina_Labels::check_kef_code(QString f_code) {
     QString query="SELECT * from ESFIItem where code='"+f_code+"'";
     qp.exec(query);
     if(qp.next())
-        return true;
+       return true;
     else
         return false;;
 
@@ -454,6 +464,29 @@ bool Elina_Labels::final_check(QString f_code) {
             return false;
 		}
 
+        if (ui.aaSpinBox->text()==ui.aaSpinBox_2->text())
+        {
+            QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                    "Δόθηκε ίδιο ταμπούρι στο 1ο και στο 2ο φύλλο"));
+            return false;
+        }
+
+        if (ui.aaSpinBox->text()==ui.aaSpinBox_3->text())
+        {
+            QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                    "Δόθηκε ίδιο ταμπούρι στο 1ο και στο 3ο φύλλο"));
+            return false;
+        }
+
+        if (ui.aaSpinBox_2->text()==ui.aaSpinBox_3->text())
+        {
+            QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
+                    "Δόθηκε ίδιο ταμπούρι στο 2ο και στο 3ο φύλλο"));
+            return false;
+        }
+
+
+
 	}
 	enable_entry_controls();
     ui.pushDelPro->setEnabled(false);
@@ -541,7 +574,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 
 	QFile fh("/dev/lp0");
 	fh.open(QIODevice::WriteOnly);
-	qDebug() << fh.error();
+    // qDebug() << fh.error();
 	QTextStream out(&fh);
 
 
@@ -553,7 +586,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 	QString line;
 
 	if (lab.open(QFile::ReadOnly)) {
-		qDebug() << lab.error();
+        // qDebug() << lab.error();
 		QTextStream in(&lab);
 		out.setCodec("UTF-8 ");
 		//out.setCodec("UTF-8");
@@ -592,7 +625,7 @@ void Elina_Labels::print_label(QString code_t, QString f_code) {
 			out.flush();
 
 		} while (!line.isNull());
-		qDebug() << lab.error();
+        //qDebug() << lab.error();
 	}
 	fh.close();
 
@@ -622,10 +655,11 @@ void Elina_Labels::insertClicked() {
 	k->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	ui.codeTableWidget->setItem(r, 1, k);
 	ex_codes << (qp.value(0).toString());
+    //TODO Activate 3 lines below
     if (!check_kef_code(qp.value(0).toString()))
-        QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-                "O κωδικός της προδιαγραφής δεν υπάρχει στο ERP"));
-
+    {
+            QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8("O κωδικός της προδιαγραφής δεν υπάρχει στο ERP"));
+}
 	ui.lineEdit->setText("");
     ui.insertButton->setEnabled(false);
 	disable_entry_controls();
@@ -689,7 +723,7 @@ void Elina_Labels::upClicked() {
 		}
 
 	}
-	qDebug() << row_sel;
+    //qDebug() << row_sel;
     ui.pushDelPro->setEnabled(false);
 
 }
@@ -731,7 +765,7 @@ void Elina_Labels::downClicked() {
 
 	}
 
-	qDebug() << row_sel;
+    //qDebug() << row_sel;
     ui.pushDelPro->setEnabled(false);
 }
 
@@ -742,7 +776,7 @@ void Elina_Labels::rowClickedSel(const QModelIndex &index) {
     ui.removeButton->setEnabled(true);
 	QTableWidgetItem *c = ui.codeTableWidget->item(row_sel, 0);
 	QString code = c->text();
-	qDebug() << code;
+    //qDebug() << code;
 	if (code == "") {
 		disable_entry_controls();
 
@@ -814,7 +848,7 @@ void Elina_Labels::refresh_production() {
                     "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from z_production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
 	query.exec(a);
 	int r = 0;
-    qDebug()<<"Q:"<<query.size();
+    // qDebug()<<"Q:"<<query.size();
 
     while (query.next() != false) {
 		ui.productiontableWidget->setRowCount(r + 1);
@@ -1049,15 +1083,24 @@ QString Elina_Labels::get_middle() {
 
 }
 QString Elina_Labels::get_middle2() {
-	QString middle = ui.machinespinBox_2->text()
-			+ ui.middleDateEdit_2->text().remove("/") + ui.aaSpinBox_2->text();
+    QString middle;
+    if (ui.aaSpinBox_2->isVisible()==true)
+        middle = ui.machinespinBox_2->text()+ ui.middleDateEdit_2->text().remove("/") + ui.aaSpinBox_2->text();
+    else
+        middle="";
+
 	return middle;
 
 }
 QString Elina_Labels::get_middle3() {
-	QString middle = ui.machinespinBox_3->text()
-			+ ui.middleDateEdit_3->text().remove("/") + ui.aaSpinBox_3->text();
-	return middle;
+    QString middle;
+    if (ui.aaSpinBox_3->isVisible()==true)
+
+        middle = ui.machinespinBox_3->text()+ ui.middleDateEdit_3->text().remove("/") + ui.aaSpinBox_3->text();
+    else
+        middle="";
+
+    return middle;
 
 }
 
@@ -1213,12 +1256,12 @@ bool Elina_Labels::checkDoubleCodeT(const QString &codeT)
         return true;
     }
 
-    q3="select * from ESMMLot";
+    q3="select * from ESMMLot where code='"+codeT+"'";
     query1.exec(q3);
     if (query1.next())
     {
         QMessageBox::critical(this, qApp->trUtf8("Προσοχή"), qApp->trUtf8(
-                "Aυτός ο Κ/Τ υπάρχει ήδη εκτυπωθεί στο ERP. Η ετικέτα δεν θα εκτυπωθεί"));
+                "Aυτός ο Κ/Τ υπάρχει ήδη στο ERP. Η ετικέτα δεν θα εκτυπωθεί"));
         return true;
     }
 
@@ -1247,15 +1290,15 @@ void Elina_Labels::log(const QString &query)
 
     if (!file.exists()) {
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qDebug() << "Cannot open file for writing: "
-                    << qPrintable(file.errorString()) << endl;
+            // qDebug() << "Cannot open file for writing: "
+                    //<< qPrintable(file.errorString()) << endl;
 
         }
     } else
         file.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&file);
-    out<<query;
 
+    out<<QDateTime::currentDateTime().toString()<<":"<<query<<"\n";
 
     file.close();
 

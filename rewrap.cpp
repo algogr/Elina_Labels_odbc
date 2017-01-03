@@ -18,6 +18,7 @@
 
 #include "rewrap.h"
 #include "elina_labels.h"
+#include <iostream>
 
 rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
     QDialog(parent),db1(db1),isDummy(true) {
@@ -44,7 +45,12 @@ rewrap::rewrap(QWidget *parent, QSqlDatabase *db1) :
 	ui.pushCancel->setFocusPolicy(Qt::NoFocus);
 	ui.pushInsert->setFocusPolicy(Qt::NoFocus);
 	connect(ui.lineOld, SIGNAL(returnPressed()), this, SLOT(scanned_old()));
+    connect(ui.lineOld_2, SIGNAL(returnPressed()), this, SLOT(scanned_old2()));
+    connect(ui.lineOld_3, SIGNAL(returnPressed()), this, SLOT(scanned_old3()));
+
     connect(ui.lineAold, SIGNAL(returnPressed()), this, SLOT(scanned_Aold()));
+    connect(ui.lineAold_2, SIGNAL(returnPressed()), this, SLOT(scanned_Aold2()));
+    connect(ui.lineAold_3, SIGNAL(returnPressed()), this, SLOT(scanned_Aold3()));
     connect(ui.lineANew1, SIGNAL(returnPressed()), this, SLOT(scanned_Anew1()));
     connect(ui.lineANew2, SIGNAL(returnPressed()), this, SLOT(scanned_Anew2()));
     connect(ui.lineANew3, SIGNAL(returnPressed()), this, SLOT(scanned_Anew3()));
@@ -79,6 +85,34 @@ void rewrap::scanned_Aold() {
     ui.lineOld->setFocus();
 }
 
+void rewrap::scanned_Aold2()
+{
+    QString scanned = ui.lineAold_2->text();
+
+    if (! Elina_Labels::checkCodeA(scanned))
+    {
+        ui.lineAold_2->setText("");
+        ui.lineAold_2->setFocus();
+        return;
+    }
+    ui.lineOld_2->setFocus();
+
+}
+void rewrap::scanned_Aold3()
+{
+    QString scanned = ui.lineAold_3->text();
+
+    if (! Elina_Labels::checkCodeA(scanned))
+    {
+        ui.lineAold_3->setText("");
+        ui.lineAold_3->setFocus();
+        return;
+    }
+    ui.lineOld_3->setFocus();
+
+}
+
+
 
 void rewrap::scanned_old() {
 	QString scanned = ui.lineOld->text();
@@ -93,6 +127,38 @@ void rewrap::scanned_old() {
     ui.lineANew1->setVisible(true);
     ui.lineANew1->setFocus();
 }
+
+void rewrap::scanned_old2()
+{
+    QString scanned = ui.lineOld_2->text();
+
+    if (!Elina_Labels::checkCodeT(scanned))
+    {
+        ui.lineOld_2->setText("");
+        ui.lineOld_2->setFocus();
+        return;
+    }
+    ui.lineANew1->setFocus();
+
+}
+
+void rewrap::scanned_old3()
+{
+    QString scanned = ui.lineOld_3->text();
+
+    if (!Elina_Labels::checkCodeT(scanned))
+    {
+        ui.lineOld_3->setText("");
+        ui.lineOld_3->setFocus();
+        return;
+    }
+
+    ui.lineANew1->setFocus();
+
+
+
+}
+
 
 void rewrap::scanned_Anew1() {
 
@@ -346,6 +412,10 @@ void rewrap::insertClicked() {
 		newWeight += ui.lineNew5->text().left(3).toInt();
 
 	oldWeight = ui.lineOld->text().left(3).toInt();
+    if (ui.lineOld_2->text() !="")
+        oldWeight+=ui.lineOld_2->text().left(3).toInt();
+    if (ui.lineOld_3->text() !="")
+        oldWeight+=ui.lineOld_3->text().left(3).toInt();
 
 
 
@@ -420,29 +490,40 @@ void rewrap::insertClicked() {
 
     if (ui.lineNew2->text()!="")
         new_codes<<ui.lineNew2->text();
+        //qDebug()<<"2"<<new_codes.size()<<"-"<<new_codes;
     if (ui.lineNew3->text()!="")
         new_codes<<ui.lineNew3->text();
+        //qDebug()<<"3"<<new_codes.size()<<"-"<<new_codes;
     if (ui.lineNew4->text()!="")
         new_codes<<ui.lineNew4->text();
     if (ui.lineNew5->text()!="")
         new_codes<<ui.lineNew5->text();
 
 
-	QString old_code = ui.lineOld->text();
+    QStringList old_codes = (QStringList()<<ui.lineOld->text());
+    if (ui.lineOld_2->text()!="")
+        old_codes<<ui.lineOld_2->text();
+    if (ui.lineOld_3->text()!="")
+        old_codes<<ui.lineOld_3->text();
+
 
     QStringList new_acodes = (QStringList() << ui.lineANew1->text());
     if (ui.lineANew2->text()!="")
-        new_codes<<ui.lineANew2->text();
+        new_acodes<<ui.lineANew2->text();
     if (ui.lineANew3->text()!="")
-        new_codes<<ui.lineANew3->text();
+        new_acodes<<ui.lineANew3->text();
     if (ui.lineANew4->text()!="")
-        new_codes<<ui.lineANew4->text();
+        new_acodes<<ui.lineANew4->text();
     if (ui.lineANew5->text()!="")
-        new_codes<<ui.lineANew5->text();
+        new_acodes<<ui.lineANew5->text();
 
-    QString old_acode = ui.lineAold->text();
+    QStringList old_acodes = (QStringList()<<ui.lineAold->text());
+    if (ui.lineAold_2->text()!="")
+            old_acodes<<ui.lineAold_2->text();
+    if (ui.lineAold_3->text()!="")
+            old_acodes<<ui.lineAold_3->text();
 
-    insert_production(old_code, new_codes,old_acode,new_acodes);
+    insert_production(old_codes, new_codes,old_acodes,new_acodes);
 	delete(this);
 }
 
@@ -450,34 +531,66 @@ void rewrap::cancelClicked() {
 	delete (this);
 }
 
-void rewrap::insert_production(const QString &old_code, const QStringList &new_codes, const QString &old_acode, const QStringList &new_acodes) {
-	QSqlQuery query(*db1);
-    query.exec(	"select top 1 pr_date from z_production where code_t='"+ old_code + "'");
-	query.next();
+void rewrap::insert_production(const QStringList &old_codes, const QStringList &new_codes, const QStringList &old_acodes, const QStringList &new_acodes) {
 
-    QString pr_date = query.value(0).toString();
+    QString pr_date = fetchPrDate(old_codes.value(0));
+    QString old_acode=old_acodes.value(0);
+    QString old_code=old_codes.value(0);
 
-    qDebug()<<"NEW_CODES:"<<new_codes.size();
+    QString pr_date2=QString();
+    QString pr_date3=QString();
+
+    QString old_acode2=QString();
+    QString old_acode3=QString();
+    QString old_code2=QString();
+    QString old_code3=QString();
+    if(old_codes.size()>1)
+    {
+           pr_date2=fetchPrDate(old_codes.value(1));
+           old_acode2=old_acodes.value(1);
+           old_code2=old_codes.value(1);
 
 
+    }
+
+    if(old_codes.size()==3)
+    {
+        pr_date3=fetchPrDate(old_codes.value(2));
+        old_acode3=old_acodes.value(2);
+        old_code3=old_codes.value(2);
+
+    }
+
+
+
+
+
+
+
+    QSqlQuery query(*db1);
 
     for (int q = 0; q < new_codes.size(); ++q) {
+        //qDebug()<<"Q:"<<q;
 		QString code_t = new_codes.value(q);
         QString code_a = new_acodes.value(q);
-        QString qstr="INSERT INTO z_rewrap (oldcode_a,oldcode_t,newcode_a,newcode_t,rewrap_date,pr_date_oldcode) VALUES (?,?,?,?,?,?)";
+        QString qstr="INSERT INTO z_rewrap (oldcode_a,oldcode_t,oldcode_a2,oldcode_t2,oldcode_a3,oldcode_t3,newcode_a,newcode_t,\
+        rewrap_date,pr_date_oldcode,pr_date_oldcode2,pr_date_oldcode3,iserp) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         bool success=query.prepare(qstr);
         query.addBindValue(old_acode);
         query.addBindValue(old_code);
+        query.addBindValue(old_acode2);
+        query.addBindValue(old_code2);
+        query.addBindValue(old_acode3);
+        query.addBindValue(old_code3);
         query.addBindValue(code_a);
         query.addBindValue(code_t);
         query.addBindValue(QDateTime::currentDateTime().toString(Qt::ISODate)) ;
         query.addBindValue(pr_date);
-
-
-        bool success1=query.exec();
-        qDebug()<<"SUCCESS"<<success;
-        qDebug()<<"SUCCESS1"<<success1;
-        Elina_Labels::log(query.executedQuery());
+        query.addBindValue(pr_date2);
+        query.addBindValue(pr_date3);
+        query.addBindValue(0);
+        query.exec();
+        Elina_Labels::log(getLastExecutedQuery(query));
 
 		}
 
@@ -489,8 +602,51 @@ void rewrap::checkDummy(const QString &code)
     query.exec(	"select top 1 * from z_production where is_dummy=1 and code_t='"+ code + "'");
     if (!query.next())
         isDummy=false;
+    else
+        isDummy=true;
 
 
+}
+
+QString rewrap::fetchPrDate(QString code_t)
+{
+    QSqlQuery query(*db1);
+    query.exec(	"select top 1 pr_date from z_production where code_t='"+ code_t + "'");
+    if (query.next())
+        return query.value(0).toString();
+    else
+        return QString();
+
+}
+
+QString rewrap::getLastExecutedQuery(const QSqlQuery& query)
+{
+    QString sql = query.executedQuery();
+    const int nbBindValues = query.boundValues().size();
+
+    for(int i = 0, j = 0; j < nbBindValues; ++j)
+    {
+        i = sql.indexOf(QLatin1Char('?'), i);
+        if (i <= 0)
+        {
+            break;
+        }
+        const QVariant &var = query.boundValue(j);
+        QSqlField field(QLatin1String(""), var.type());
+        if (var.isNull())
+        {
+            field.clear();
+        }
+        else
+        {
+            field.setValue(var);
+        }
+        QString formatV = query.driver()->formatValue(field);
+        sql.replace(i, 1, formatV);
+        i += formatV.length();
+    }
+
+    return sql;
 }
 
 
