@@ -845,7 +845,7 @@ void Elina_Labels::refresh_production() {
 
 	QString
 			a =
-                    "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from z_production where pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
+                    "SELECT pr_date,f_code,weight,code_t,iserp,quality,vardia from z_production where is_deleted=0 and pr_date>=dateadd(hour,-8,getdate()) order by pr_date desc";
 	query.exec(a);
 	int r = 0;
     // qDebug()<<"Q:"<<query.size();
